@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0eefa4ce-e9ea-44b9-8f02-c3423378e1af" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/ConstructionZone.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConstructionZone.py" beforeDir="false" afterPath="$PROJECT_DIR$/ConstructionZone.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -25,7 +25,7 @@
           <entry key="csv" value="6" />
           <entry key="gitignore" value="1" />
           <entry key="md" value="1" />
-          <entry key="py" value="4" />
+          <entry key="py" value="5" />
           <entry key="txt" value="1" />
         </counts>
       </usages-collector>
@@ -33,45 +33,45 @@
         <counts>
           <entry key="Markdown" value="1" />
           <entry key="PLAIN_TEXT" value="8" />
-          <entry key="Python" value="4" />
+          <entry key="Python" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="gitignore" value="45" />
-          <entry key="py" value="1149" />
+          <entry key="py" value="3121" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="45" />
-          <entry key="Python" value="1149" />
+          <entry key="Python" value="3121" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="12" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
+            <state relative-caret-position="340">
+              <caret line="41" column="78" selection-start-line="41" selection-start-column="78" selection-end-line="41" selection-end-column="78" />
+              <folding>
+                <element signature="e#108#123#0" expanded="true" />
+                <marker date="1537569558000" expanded="true" signature="2179:2353" ph="..." />
+                <marker date="1537569558000" expanded="true" signature="2410:2415" ph="..." />
+                <marker date="1537569558000" expanded="true" signature="2749:2754" ph="..." />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/pandas/core/indexing.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="194">
-              <caret line="32" column="73" selection-start-line="32" selection-start-column="73" selection-end-line="32" selection-end-column="73" />
-              <folding>
-                <element signature="e#108#123#0" expanded="true" />
-                <marker date="1537560033000" expanded="true" signature="406:600" ph="..." />
-                <marker date="1537560033000" expanded="true" signature="657:662" ph="..." />
-                <marker date="1537560033000" expanded="true" signature="996:1001" ph="..." />
-              </folding>
+            <state relative-caret-position="132">
+              <caret line="1946" selection-start-line="1946" selection-end-line="1946" />
             </state>
           </provider>
         </entry>
@@ -138,7 +138,9 @@
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/vocabulary.txt">
-          <provider selected="true" editor-type-id="text-editor" />
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-917439" />
+          </provider>
         </entry>
       </file>
     </leaf>
@@ -261,8 +263,8 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32972974" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32972974" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32972974" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32972974" />
@@ -278,20 +280,61 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ConstructionZone.py</url>
+          <line>28</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string>allClasses</expression-string>
+        <expression-string>trainingDfByClass.iloc[0:61188].sum(axis=1)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>len(trainingDf.loc[trainingDf[61189] == num])</expression-string>
+        <expression-string>trainingDfByClass.iloc[0:61188].sum(axis=1)[0]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>list(trainingDf[61189].value_counts())</expression-string>
+        <expression-string>trainingDfByClass.loc[0:61188].sum()</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>totalWords</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>trainingDfByClass</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>len(trainingDfByClass)</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>trainingDfByClass.size()</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>trainingDfByClass.loc[numWord].sum()</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>trainingDfByClass.empty</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -304,9 +347,6 @@
           <caret line="2" column="12" selection-start-line="2" selection-start-column="12" selection-end-line="2" selection-end-column="12" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vocabulary.txt">
-      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/training.csv">
       <provider selected="true" editor-type-id="LargeFileEditor">
@@ -362,15 +402,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/vocabulary.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-917439" />
+      </provider>
+    </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/pandas/core/indexing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="1946" selection-start-line="1946" selection-end-line="1946" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="194">
-          <caret line="32" column="73" selection-start-line="32" selection-start-column="73" selection-end-line="32" selection-end-column="73" />
+        <state relative-caret-position="340">
+          <caret line="41" column="78" selection-start-line="41" selection-start-column="78" selection-end-line="41" selection-end-column="78" />
           <folding>
             <element signature="e#108#123#0" expanded="true" />
-            <marker date="1537560033000" expanded="true" signature="406:600" ph="..." />
-            <marker date="1537560033000" expanded="true" signature="657:662" ph="..." />
-            <marker date="1537560033000" expanded="true" signature="996:1001" ph="..." />
+            <marker date="1537569558000" expanded="true" signature="2179:2353" ph="..." />
+            <marker date="1537569558000" expanded="true" signature="2410:2415" ph="..." />
+            <marker date="1537569558000" expanded="true" signature="2749:2754" ph="..." />
           </folding>
         </state>
       </provider>
