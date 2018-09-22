@@ -3,7 +3,7 @@ import pandas as pd
 import scipy as sp
 import numpy as np
 
-#pd.read_csv("training.csv", header=None, nrows=100).to_csv("sparse_training_tiny.csv")
+#pd.read_csv("training.csv", header=None, nrows=200).to_csv("sparse_training_tiny.csv",header=False)
 
 labelsFile = open('newsgrouplabels.txt', "r")
 allLabels = labelsFile.read().splitlines()
@@ -18,11 +18,17 @@ numWords = len(allWords)
 allWordIds = list(range(1,numWords+1))
 
 colNames = ['docId']+list(range(1,len(allWords)+1))+['labelId']
-trainingDf = pd.read_csv("sparse_training_tiny.csv",header=0,
+trainingDf = pd.read_csv("training.csv",header=None,
                          names=colNames).to_sparse(fill_value=0)
-labelProportions = trainingDf['labelId'].value_counts(normalize=True)
-labelWordSums = trainingDf.groupby('labelId')[allWordIds].agg(np.sum).to_sparse(fill_value=0)
-labelSums = labelWordSums.sum(axis=1)
+print(trainingDf)
 
+labelProportions = trainingDf['labelId'].value_counts(normalize=True)
+print(labelProportions)
 labelProportions.plot(kind='pie')
+
+labelWordSums = trainingDf.groupby('labelId')[allWordIds].agg(np.sum).to_sparse(fill_value=0)
+print(labelWordSums)
+
+labelSums = labelWordSums.sum(axis=1)
+print(labelSums)
 labelSums.plot(kind='bar')
