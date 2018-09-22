@@ -17,7 +17,10 @@ vocabularyLength = 61188
 beta = 1/vocabularyLength
 alpha = 1 + beta
 allClasses = pd.read_csv("newsgrouplabels.txt", header=None)
-
+classWordCounts = dict([(1, 154382), (2, 138499), (3, 116141), (4, 103535), (5, 90456),
+                        (6, 144656), (7, 64094), (8, 107399), (9, 110928), (10, 124537), (11, 143087),
+                        (12, 191242), (13, 97924), (14, 158930), (15, 162521), (16, 236747), (17, 172257),
+                        (18, 280067), (19, 172670), (20, 135764)])
 # Generate a dataframe for priors.
 def generateMLEpriors(trainingDf):
     # totalClasses = len(allClasses.index)
@@ -34,14 +37,14 @@ def generateMAPmatrix(trainingDf):
     listoflists = []
     for numClass, newsGroup in allClasses.iterrows():
         rowdata = []
-        for numWord, word in vocabDf.iterrows():
-            trainingDfByClass = trainingDf.loc[trainingDf[61189] == numClass]
+        totalWordsInClass = classWordCounts.get(numClass + 1)
+        trainingDfByClass = trainingDf.loc[trainingDf[61189] == numClass]
+        for numWord, word  in vocabDf.iterrows():
             if len(trainingDfByClass) > 1:
                 # Counting the words in a class is too slow using dataframes.
                 # There is probably a faster way to do this (either that, or create a
                 # file that just stores these values in a vector or something)
-                countWordsinClass = trainingDfByClass.iloc[numWord].sum()
-                totalWordsInClass = getTotalWords(trainingDfByClass)
+                countWordsinClass = trainingDfByClass[numWord].sum()
             else:
                 # don't skip zero counts since we are using MAP hallucinated values.
                 countWordsinClass = totalWordsInClass = 0
@@ -49,6 +52,7 @@ def generateMAPmatrix(trainingDf):
             denominator = totalWordsInClass + ((alpha - 1)*vocabularyLength)
             rowdata.append(numerator/denominator)
         listoflists.append(rowdata)
+        print(rowdata)
     return pd.DataFrame(listoflists)
 
 def getTotalWords(trainingDfByClass):
@@ -59,14 +63,6 @@ def getTotalWords(trainingDfByClass):
     for count in totalWords:
         totalWordCount = totalWordCount + count
     return totalWordCount
-
-
-
-
-
-
-
-
 
 
 def generateSparseFiles(trainingDataFile="training.csv"):
@@ -82,6 +78,8 @@ def main():
     # generateSparseFiles() - we should discuss how to do this. We may not want to use pandas...
     trainingdf = pd.read_csv("sparse_training_tiny.csv", header=None)
     priorsdf = generateMLEpriors(trainingdf)
+    priorsdf.to_csv("priors.csv")
     mapdf = generateMAPmatrix(trainingdf)
+    mapdf.to_csv("map_probabilities.csv")
 
 if __name__ == "__main__": main()
