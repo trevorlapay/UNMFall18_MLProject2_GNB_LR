@@ -23,3 +23,6 @@ trainingDf = pd.read_csv("sparse_training_tiny.csv",header=0,
 labelProportions = trainingDf['labelId'].value_counts(normalize=True)
 labelWordSums = trainingDf.groupby('labelId')[allWordIds].agg(np.sum).to_sparse(fill_value=0)
 labelSums = labelWordSums.sum(axis=1)
+
+labelProportions.plot(kind='pie')
+labelSums.plot(kind='bar')
