@@ -27,7 +27,7 @@ def generateMLEpriors(trainingDf):
     numDocs = len(trainingDf)
     priors = []
     for num, val in allClasses.iterrows():
-        prior = len(trainingDf.loc[trainingDf[classColumn] == num])/numDocs
+        prior = len(trainingDf.loc[trainingDf[classColumn] == (num+1)])/numDocs
         priors.append(prior)
     return pd.DataFrame(priors)
 
@@ -38,7 +38,7 @@ def generateMAPmatrix(trainingDf):
     for numClass, newsGroup in allClasses.iterrows():
         rowdata = []
         totalWordsInClass = classWordCounts.get(numClass + 1)
-        trainingDfByClass = trainingDf.loc[trainingDf[61189] == numClass]
+        trainingDfByClass = trainingDf.loc[trainingDf[61189] == (numClass + 1)]
         for numWord, word  in vocabDf.iterrows():
             if len(trainingDfByClass) > 1:
                 # Counting the words in a class is too slow using dataframes.
@@ -55,28 +55,13 @@ def generateMAPmatrix(trainingDf):
         print(rowdata)
     return pd.DataFrame(listoflists)
 
-def getTotalWords(trainingDfByClass):
-    totalWordCount = 0
-    # I need to get the sum of all the words for a given class here.
-    # this is absolutely broken (it returns the same value every time). I'm leaving it as a placeholder for now.
-    totalWords = trainingDfByClass.iloc[0:61188].sum(axis=1)
-    for count in totalWords:
-        totalWordCount = totalWordCount + count
-    return totalWordCount
-
-
-def generateSparseFiles(trainingDataFile="training.csv"):
-    trainingdf = pd.read_csv(trainingDataFile, header=None, nrows=100)
-    sparse = trainingdf.to_sparse()
-    # this is not sparse - it is loaded with zeros. For now just restricting the number of rows.
-    # for now, only generate training (until we get the rest fleshed out)
-    sparse.to_csv("sparse_training_tiny.csv")
-
-
 
 def main():
     # generateSparseFiles() - we should discuss how to do this. We may not want to use pandas...
-    trainingdf = pd.read_csv("sparse_training_tiny.csv", header=None)
+    # vocabFile = open('vocabulary.txt', "r")
+    # allWords = vocabFile.read().splitlines()
+    # colNames = ['docId'] + list(range(1, len(allWords) + 1)) + ['labelId']
+    trainingdf = pd.read_csv("training.csv", header=None).to_sparse(fill_value=0)
     priorsdf = generateMLEpriors(trainingdf)
     priorsdf.to_csv("priors.csv")
     mapdf = generateMAPmatrix(trainingdf)
