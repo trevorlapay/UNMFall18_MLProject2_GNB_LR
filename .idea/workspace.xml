@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0eefa4ce-e9ea-44b9-8f02-c3423378e1af" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ConstructionZone.py" beforeDir="false" afterPath="$PROJECT_DIR$/ConstructionZone.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/map_probabilities.csv" beforeDir="false" afterPath="$PROJECT_DIR$/map_probabilities.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/priors.csv" beforeDir="false" afterPath="$PROJECT_DIR$/priors.csv" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -26,14 +23,14 @@
         <counts>
           <entry key="csv" value="12" />
           <entry key="gitignore" value="1" />
-          <entry key="md" value="3" />
+          <entry key="md" value="4" />
           <entry key="py" value="6" />
           <entry key="txt" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Markdown" value="3" />
+          <entry key="Markdown" value="4" />
           <entry key="PLAIN_TEXT" value="16" />
           <entry key="Python" value="6" />
         </counts>
@@ -41,13 +38,13 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="gitignore" value="45" />
-          <entry key="py" value="3760" />
+          <entry key="py" value="6133" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="45" />
-          <entry key="Python" value="3760" />
+          <entry key="Python" value="6133" />
         </counts>
       </usages-collector>
     </session>
@@ -57,13 +54,25 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="295">
-              <caret line="48" column="84" selection-start-line="48" selection-start-column="84" selection-end-line="48" selection-end-column="84" />
+            <state relative-caret-position="329">
+              <caret line="101" column="28" selection-start-line="101" selection-start-column="28" selection-end-line="101" selection-end-column="28" />
               <folding>
                 <element signature="e#108#123#0" expanded="true" />
-                <marker date="1537719861000" expanded="true" signature="2316:2317" ph="..." />
-                <marker date="1537719861000" expanded="true" signature="2330:2335" ph="..." />
+                <marker date="1537761958000" expanded="true" signature="1848:1853" ph="..." />
+                <marker date="1537761958000" expanded="true" signature="1848:2744" ph="..." />
+                <marker date="1537761958000" expanded="true" signature="3989:3990" ph="..." />
+                <marker date="1537761958000" expanded="true" signature="4003:4008" ph="..." />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MLProject2Notes.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor />
+              <second_editor />
             </state>
           </provider>
         </entry>
@@ -74,17 +83,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/training_sparse.csv">
-          <provider selected="true" editor-type-id="LargeFileEditor">
-            <state relative-caret-position="21622">
-              <caret line="7" column="122381" selection-start-line="7" selection-start-column="122381" selection-end-line="7" selection-end-column="122383" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/training.csv">
-          <provider selected="true" editor-type-id="LargeFileEditor" />
+          <provider selected="true" editor-type-id="LargeFileEditor">
+            <state relative-caret-position="-26191" />
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -116,8 +118,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/priors.csv">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="1" column="5" selection-start-line="1" selection-start-column="5" selection-end-line="1" selection-end-column="5" />
+            <state relative-caret-position="300">
+              <caret line="20" column="7" selection-start-line="20" selection-start-column="7" selection-end-line="20" selection-end-column="7" />
             </state>
           </provider>
         </entry>
@@ -125,7 +127,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/map_probabilities.csv">
           <provider selected="true" editor-type-id="LargeFileEditor">
-            <state relative-caret-position="-97830" />
+            <state relative-caret-position="-38408" />
           </provider>
         </entry>
       </file>
@@ -171,8 +173,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-5" />
-    <option name="y" value="37" />
+    <option name="x" value="-39" />
+    <option name="y" value="89" />
     <option name="width" value="1440" />
     <option name="height" value="832" />
   </component>
@@ -288,7 +290,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-5" y="37" width="1440" height="832" extended-state="0" />
+    <frame x="-39" y="89" width="1440" height="832" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24947146" />
@@ -337,47 +339,47 @@
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string>len(trainingDf.loc[trainingDf[classColumn] == num])</expression-string>
+        <expression-string>math.log2(val.iloc[0])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>trainingDf.loc[trainingDf[classColumn] == num]</expression-string>
+        <expression-string>val.iloc[0]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>trainingDf.loc[trainingDf[classColumn] == num])</expression-string>
+        <expression-string>trainingDf.iloc[row].multiply(probabilityMatrix.iloc[num]).values.sum()</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>numDocs</expression-string>
+        <expression-string>trainingDf.iloc[row].multiply(probabilityMatrix.iloc[num])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>num</expression-string>
+        <expression-string>trainingDf.iloc[row]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>trainingDfByClass</expression-string>
+        <expression-string>row</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>vocabDf</expression-string>
+        <expression-string>row.multiply(probabilityMatrix.iloc[num])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>trainingDfByClass.iloc[numWord].sum()</expression-string>
+        <expression-string>probabilityMatrix.iloc[num]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>trainingDfByClass.iloc[0:61188].sum(axis=1)</expression-string>
+        <expression-string>row.mul(probabilityMatrix.iloc[num])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -424,14 +426,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="141">
           <caret line="2" column="70851" selection-start-line="2" selection-start-column="70851" selection-end-line="2" selection-end-column="70851" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MLProject2Notes.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor />
-          <second_editor />
         </state>
       </provider>
     </entry>
@@ -482,29 +476,41 @@
     <entry file="file://$PROJECT_DIR$/newsgrouplabels.txt">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/training.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/map_probabilities.csv">
       <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="-97830" />
+        <state relative-caret-position="-38408" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/priors.csv">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="5" selection-start-line="1" selection-start-column="5" selection-end-line="1" selection-end-column="5" />
+        <state relative-caret-position="300">
+          <caret line="20" column="7" selection-start-line="20" selection-start-column="7" selection-end-line="20" selection-end-column="7" />
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MLProject2Notes.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor />
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/training.csv">
+      <provider selected="true" editor-type-id="LargeFileEditor">
+        <state relative-caret-position="-26191" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="48" column="84" selection-start-line="48" selection-start-column="84" selection-end-line="48" selection-end-column="84" />
+        <state relative-caret-position="329">
+          <caret line="101" column="28" selection-start-line="101" selection-start-column="28" selection-end-line="101" selection-end-column="28" />
           <folding>
             <element signature="e#108#123#0" expanded="true" />
-            <marker date="1537719861000" expanded="true" signature="2316:2317" ph="..." />
-            <marker date="1537719861000" expanded="true" signature="2330:2335" ph="..." />
+            <marker date="1537761958000" expanded="true" signature="1848:1853" ph="..." />
+            <marker date="1537761958000" expanded="true" signature="1848:2744" ph="..." />
+            <marker date="1537761958000" expanded="true" signature="3989:3990" ph="..." />
+            <marker date="1537761958000" expanded="true" signature="4003:4008" ph="..." />
           </folding>
         </state>
       </provider>
