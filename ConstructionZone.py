@@ -99,8 +99,9 @@ def generateSubmissionFileNB(testingDataFile="testing.csv", answersDataFile="ans
     allWords = vocabFile.read().splitlines()
     colNames = ['docId'] + list(range(1, len(allWords) + 1))
     testingDF = pd.read_csv(testingDataFile, header=None, names=colNames)
-    testingDF['classification'] = naiveBayesClassify(testingDF)
-    testingDF.to_csv(answersDataFile)
+    answerDF = testingDF.filter(['docId'], axis=1)
+    answerDF['classification'] = naiveBayesClassify(testingDF)
+    answerDF.to_csv(answersDataFile, index=False)
 
 
 def main():
