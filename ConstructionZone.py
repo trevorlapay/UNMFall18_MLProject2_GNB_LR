@@ -51,7 +51,7 @@ def generateMLEpriors(trainingDf):
 def naiveBayesClassify(testingDf):
     # take argmax of the probability of a test example belonging to a given class across all features.
     # drop doc_id column.
-    testingDf = testingDf.drop('docId', axis=1)
+    testingDf = testingDf.drop('id', axis=1)
     probabilityMatrix = pd.read_csv("map_probabilities.csv", header=None).drop(0, axis=1).drop(0, axis=0)
     # apply log2 first for calculating log sums
     probabilityMatrix = probabilityMatrix.applymap(math.log2)
@@ -97,10 +97,10 @@ def generateMAPmatrix(trainingDf):
 def generateSubmissionFileNB(testingDataFile="testing.csv", answersDataFile="answers.csv"):
     vocabFile = open('vocabulary.txt', "r")
     allWords = vocabFile.read().splitlines()
-    colNames = ['docId'] + list(range(1, len(allWords) + 1))
+    colNames = ['id'] + list(range(1, len(allWords) + 1))
     testingDF = pd.read_csv(testingDataFile, header=None, names=colNames)
-    answerDF = testingDF.filter(['docId'], axis=1)
-    answerDF['classification'] = naiveBayesClassify(testingDF)
+    answerDF = testingDF.filter(['id'], axis=1)
+    answerDF['class'] = naiveBayesClassify(testingDF)
     answerDF.to_csv(answersDataFile, index=False)
 
 
@@ -108,10 +108,10 @@ def main():
     # generateSparseFiles() - we should discuss how to do this. We may not want to use pandas...
     # vocabFile = open('vocabulary.txt', "r")
     # allWords = vocabFile.read().splitlines()
-    # colNames = ['docId'] + list(range(1, len(allWords) + 1)) + ['labelId']
+    # colNames = ['id'] + list(range(1, len(allWords) + 1)) + ['labelId']
     # vocabFile = open('vocabulary.txt', "r")
     # allWords = vocabFile.read().splitlines()
-    # colNames = ['docId'] + list(range(1, len(allWords) + 1))
+    # colNames = ['id'] + list(range(1, len(allWords) + 1))
     # trainingDf = pd.read_csv("training.csv", header=None,
     #                        names=colNames).to_sparse(fill_value=0)
     # priorsdf = generateMLEpriors(trainingDf)
