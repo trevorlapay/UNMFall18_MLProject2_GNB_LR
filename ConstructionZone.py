@@ -9,22 +9,31 @@ import argparse
 import pandas as pd
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 
 # MAP constants
 classColumn = 61189
 vocabularyLength = 61188
-beta = 1/vocabularyLength
+beta = .01
 alpha = 1 + beta
 labelsFile = open('newsgrouplabels.txt', "r")
 allLabels = labelsFile.read().splitlines()
+
+# word counts won't change (unless we change the training set)
 classWordCounts = dict([(1, 154382), (2, 138499), (3, 116141), (4, 103535), (5, 90456),
                         (6, 144656), (7, 64094), (8, 107399), (9, 110928), (10, 124537), (11, 143087),
                         (12, 191242), (13, 97924), (14, 158930), (15, 162521), (16, 236747), (17, 172257),
                         (18, 280067), (19, 172670), (20, 135764)])
+
+# Priors (these won't change unless we change the training set)
 priors = [.04025, .052, .051833333333333335, .05358333333333333, .050166666666666665, .0525, .0515, .051166666666666666,
           .05408333333333333, .052333333333333336, .05383333333333333, .05325, .05216666666666667, .05175,
           .05308333333333334, .05425, .04833333333333333, .049416666666666664, .03891666666666667, .035583333333333335]
+
+# Accuracies at various beta levels for plotting.
+beta_accuracies = [(.00001, .88367), (.000016, .88367), (.0001, .88957), (.001, .89371), (.01, .89784),
+                        (.1, .89193), (.2, .88662), (.5, .87835), (.8, .86625), (1, .85562)]
 
 # Generate a dataframe for priors.
 # this should never change, so only do it once and store the values in an array.
@@ -71,7 +80,12 @@ def naiveBayesClassify(testingDf):
 
 # Generate a MAP dataframe for probabilites across classes and features.
 # This needs to be updated every time the beta value changes.
-def generateMAPmatrix(trainingDf):
+def generateMAPmatrix():
+    vocabFile = open('vocabulary.txt', "r")
+    allWords = vocabFile.read().splitlines()
+    colNames = ['id'] + list(range(1, len(allWords) + 1)) + ['labelId']
+    trainingDf = pd.read_csv("training.csv", header=None,
+                           names=colNames).to_sparse(fill_value=0)
     vocabFile = open('vocabulary.txt', "r")
     allWords = vocabFile.read().splitlines()
     listoflists = []
@@ -103,22 +117,19 @@ def generateSubmissionFileNB(testingDataFile="testing.csv", answersDataFile="ans
     answerDF['class'] = naiveBayesClassify(testingDF)
     answerDF.to_csv(answersDataFile, index=False)
 
+def plotBetaValues():
+    plt.semilogx(*zip(*beta_accuracies))
+    plt.xlabel("Beta Value")
+    plt.ylabel("Accuracy")
+    plt.show()
 
 def main():
     # generateSparseFiles() - we should discuss how to do this. We may not want to use pandas...
-    # vocabFile = open('vocabulary.txt', "r")
-    # allWords = vocabFile.read().splitlines()
-    # colNames = ['id'] + list(range(1, len(allWords) + 1)) + ['labelId']
-    # vocabFile = open('vocabulary.txt', "r")
-    # allWords = vocabFile.read().splitlines()
-    # colNames = ['id'] + list(range(1, len(allWords) + 1))
-    # trainingDf = pd.read_csv("training.csv", header=None,
-    #                        names=colNames).to_sparse(fill_value=0)
-    # priorsdf = generateMLEpriors(trainingDf)
-    # priorsdf.to_csv("priors.csv")
-    # mapdf = generateMAPmatrix(trainingDf)
+    # mapdf = generateMAPmatrix()
     # mapdf.to_csv("map_probabilities.csv")
     # The classifier scores 100% against the training data (I didn't do any Beta-tuning yet)
-    generateSubmissionFileNB()
+    # generateSubmissionFileNB()
+    plotBetaValues()
+
 
 if __name__ == "__main__": main()
