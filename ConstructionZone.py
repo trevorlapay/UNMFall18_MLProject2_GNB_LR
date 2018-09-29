@@ -194,7 +194,7 @@ def generateAll(trainingDf):
 
 def main():
     # trainingDf, testingDf = splitTrainingTesting(1200)
-    trainingDf, testingDf = loadTrainingAndTestingFromFile(True)
+    trainingDf, testingDf = loadTrainingAndTestingFromFile()
     generateMAPmatrix(trainingDf)
     generateConfusionPlot(testingDf)
     # generateClassCounts(trainingDf)

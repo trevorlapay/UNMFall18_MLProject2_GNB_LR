@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0eefa4ce-e9ea-44b9-8f02-c3423378e1af" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/label_counts.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/testing_split.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/training_split.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ConstructionZone.py" beforeDir="false" afterPath="$PROJECT_DIR$/ConstructionZone.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/map_probabilities.csv" beforeDir="false" afterPath="$PROJECT_DIR$/map_probabilities.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/priors.csv" beforeDir="false" afterPath="$PROJECT_DIR$/priors.csv" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -63,7 +56,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="60">
@@ -72,22 +65,22 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="103">
-              <caret line="48" column="1" selection-start-line="48" selection-start-column="1" selection-end-line="48" selection-end-column="1" />
+            <state relative-caret-position="196">
+              <caret line="196" column="59" selection-start-line="196" selection-start-column="59" selection-end-line="196" selection-end-column="59" />
               <folding>
                 <element signature="e#99#114#0" expanded="true" />
-                <marker date="1538245398000" expanded="true" signature="2282:2287" ph="..." />
-                <marker date="1538245398000" expanded="true" signature="2282:3408" ph="..." />
-                <marker date="1538245398000" expanded="true" signature="4653:4654" ph="..." />
-                <marker date="1538245398000" expanded="true" signature="6166:6357" ph="..." />
-                <marker date="1538245398000" expanded="true" signature="6391:6730" ph="..." />
-                <marker date="1538245398000" expanded="true" signature="6760:6765" ph="..." />
-                <marker date="1538245398000" expanded="true" signature="6760:8674" ph="..." />
-                <marker date="1538245398000" expanded="true" signature="8193:8376" ph="..." />
-                <marker date="1538245398000" expanded="true" signature="8571:8674" ph="..." />
+                <marker date="1538246082000" expanded="true" signature="2282:2287" ph="..." />
+                <marker date="1538246082000" expanded="true" signature="2282:3408" ph="..." />
+                <marker date="1538246082000" expanded="true" signature="4653:4654" ph="..." />
+                <marker date="1538246082000" expanded="true" signature="6166:6357" ph="..." />
+                <marker date="1538246082000" expanded="true" signature="6391:6730" ph="..." />
+                <marker date="1538246082000" expanded="true" signature="6760:6765" ph="..." />
+                <marker date="1538246082000" expanded="true" signature="6760:8674" ph="..." />
+                <marker date="1538246082000" expanded="true" signature="8193:8376" ph="..." />
+                <marker date="1538246082000" expanded="true" signature="8571:8674" ph="..." />
               </folding>
             </state>
           </provider>
@@ -191,8 +184,8 @@
       <list>
         <option value="$PROJECT_DIR$/answers.csv" />
         <option value="$PROJECT_DIR$/beta_results" />
-        <option value="$PROJECT_DIR$/ConstructionZone.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/ConstructionZone.py" />
       </list>
     </option>
   </component>
@@ -597,29 +590,29 @@
         <state relative-caret-position="-137319" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="103">
-          <caret line="48" column="1" selection-start-line="48" selection-start-column="1" selection-end-line="48" selection-end-column="1" />
-          <folding>
-            <element signature="e#99#114#0" expanded="true" />
-            <marker date="1538245398000" expanded="true" signature="2282:2287" ph="..." />
-            <marker date="1538245398000" expanded="true" signature="2282:3408" ph="..." />
-            <marker date="1538245398000" expanded="true" signature="4653:4654" ph="..." />
-            <marker date="1538245398000" expanded="true" signature="6166:6357" ph="..." />
-            <marker date="1538245398000" expanded="true" signature="6391:6730" ph="..." />
-            <marker date="1538245398000" expanded="true" signature="6760:6765" ph="..." />
-            <marker date="1538245398000" expanded="true" signature="6760:8674" ph="..." />
-            <marker date="1538245398000" expanded="true" signature="8193:8376" ph="..." />
-            <marker date="1538245398000" expanded="true" signature="8571:8674" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="14" selection-start-line="4" selection-start-column="14" selection-end-line="4" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="196" column="59" selection-start-line="196" selection-start-column="59" selection-end-line="196" selection-end-column="59" />
+          <folding>
+            <element signature="e#99#114#0" expanded="true" />
+            <marker date="1538246082000" expanded="true" signature="2282:2287" ph="..." />
+            <marker date="1538246082000" expanded="true" signature="2282:3408" ph="..." />
+            <marker date="1538246082000" expanded="true" signature="4653:4654" ph="..." />
+            <marker date="1538246082000" expanded="true" signature="6166:6357" ph="..." />
+            <marker date="1538246082000" expanded="true" signature="6391:6730" ph="..." />
+            <marker date="1538246082000" expanded="true" signature="6760:6765" ph="..." />
+            <marker date="1538246082000" expanded="true" signature="6760:8674" ph="..." />
+            <marker date="1538246082000" expanded="true" signature="8193:8376" ph="..." />
+            <marker date="1538246082000" expanded="true" signature="8571:8674" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
