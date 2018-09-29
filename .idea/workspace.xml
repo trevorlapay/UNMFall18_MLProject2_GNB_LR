@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0eefa4ce-e9ea-44b9-8f02-c3423378e1af" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/beta_results" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ConstructionZone.py" beforeDir="false" afterPath="$PROJECT_DIR$/ConstructionZone.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/map_probabilities.csv" beforeDir="false" afterPath="$PROJECT_DIR$/map_probabilities.csv" afterDir="false" />
@@ -19,7 +18,8 @@
         <counts>
           <entry key="project.closed" value="1" />
           <entry key="project.open.time.0" value="2" />
-          <entry key="project.opened" value="2" />
+          <entry key="project.open.time.12" value="1" />
+          <entry key="project.opened" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -44,13 +44,13 @@
           <entry key="beta_results" value="154" />
           <entry key="csv" value="7" />
           <entry key="gitignore" value="57" />
-          <entry key="py" value="7859" />
+          <entry key="py" value="9167" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="218" />
-          <entry key="Python" value="7859" />
+          <entry key="Python" value="9167" />
         </counts>
       </usages-collector>
     </session>
@@ -69,14 +69,17 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="213">
-              <caret line="121" column="26" selection-start-line="121" selection-start-column="26" selection-end-line="121" selection-end-column="26" />
+            <state relative-caret-position="381">
+              <caret line="154" column="4" lean-forward="true" selection-start-line="154" selection-start-column="4" selection-end-line="154" selection-end-column="4" />
               <folding>
                 <element signature="e#99#114#0" expanded="true" />
-                <marker date="1538108906000" expanded="true" signature="2623:2628" ph="..." />
-                <marker date="1538108906000" expanded="true" signature="2623:3585" ph="..." />
-                <marker date="1538108906000" expanded="true" signature="5183:5184" ph="..." />
-                <marker date="1538108906000" expanded="true" signature="5797:5802" ph="..." />
+                <marker date="1538198301000" expanded="true" signature="2623:2628" ph="..." />
+                <marker date="1538198301000" expanded="true" signature="2623:3585" ph="..." />
+                <marker date="1538198301000" expanded="true" signature="4932:4933" ph="..." />
+                <marker date="1538198301000" expanded="true" signature="6217:6292" ph="..." />
+                <marker date="1538198301000" expanded="true" signature="6326:6509" ph="..." />
+                <marker date="1538198301000" expanded="true" signature="6528:6533" ph="..." />
+                <marker date="1538198301000" expanded="true" signature="6528:6814" ph="..." />
               </folding>
             </state>
           </provider>
@@ -86,7 +89,7 @@
         <entry file="file://$PROJECT_DIR$/beta_results">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="135">
-              <caret line="9" column="10" lean-forward="true" selection-start-line="9" selection-start-column="10" selection-end-line="9" selection-end-column="10" />
+              <caret line="9" column="10" selection-start-line="9" selection-start-column="10" selection-end-line="9" selection-end-column="10" />
             </state>
           </provider>
         </entry>
@@ -94,7 +97,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/answers.csv">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
+            <state>
               <caret line="16" column="7" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="7" />
             </state>
           </provider>
@@ -103,7 +106,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/codecs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="192">
+            <state relative-caret-position="4620">
               <caret line="309" selection-start-line="309" selection-end-line="309" />
             </state>
           </provider>
@@ -112,7 +115,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/pandas/core/indexes/base.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="147">
+            <state relative-caret-position="65100">
               <caret line="4403" selection-start-line="4403" selection-end-line="4403" />
             </state>
           </provider>
@@ -121,7 +124,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/testing.csv">
           <provider selected="true" editor-type-id="LargeFileEditor">
-            <state relative-caret-position="-104840">
+            <state>
               <caret line="1" column="122237" selection-start-line="1" selection-start-column="122237" selection-end-line="1" selection-end-column="122237" />
             </state>
           </provider>
@@ -129,15 +132,13 @@
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/training.csv">
-          <provider selected="true" editor-type-id="LargeFileEditor">
-            <state relative-caret-position="-52368" />
-          </provider>
+          <provider selected="true" editor-type-id="LargeFileEditor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/map_probabilities.csv">
           <provider selected="true" editor-type-id="LargeFileEditor">
-            <state relative-caret-position="32">
+            <state>
               <caret line="1" column="39863" selection-start-line="1" selection-start-column="39863" selection-end-line="1" selection-end-column="39863" />
             </state>
           </provider>
@@ -146,8 +147,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ConstructionZone2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="232">
-              <caret line="19" column="32" selection-start-line="19" selection-start-column="32" selection-end-line="19" selection-end-column="32" />
+            <state relative-caret-position="255">
+              <caret line="20" selection-start-line="20" selection-end-line="21" selection-end-column="64" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -171,6 +172,7 @@
       <find>docId</find>
       <find>classi</find>
       <find>labelid</find>
+      <find>naiveBayesClassify</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -189,17 +191,18 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="-14" />
-    <option name="y" value="28" />
-    <option name="width" value="1440" />
-    <option name="height" value="832" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="205" />
+    <option name="y" value="74" />
+    <option name="width" value="1420" />
+    <option name="height" value="812" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -211,7 +214,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -324,6 +326,7 @@
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32972974" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32972974" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.32972974" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -446,14 +449,7 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/sparse_traning.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-77687" />
-      </provider>
-      <provider editor-type-id="LargeFileEditor">
-        <state relative-caret-position="-5235" />
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/sparse_traning.csv" />
     <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/pandas/core/ops.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="139">
@@ -468,13 +464,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sparse_training_tiny.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="141">
-          <caret line="2" column="70851" selection-start-line="2" selection-start-column="70851" selection-end-line="2" selection-end-column="70851" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/sparse_training_tiny.csv" />
     <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/pandas/core/indexing.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="215">
@@ -499,13 +489,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training_sparse.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="21622">
-          <caret line="7" column="122381" selection-start-line="7" selection-start-column="122381" selection-end-line="7" selection-end-column="122383" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/training_sparse.csv" />
     <entry file="file://$PROJECT_DIR$/newsgrouplabels.txt">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -531,32 +515,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/pandas/core/indexes/base.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="4403" selection-start-line="4403" selection-end-line="4403" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/training.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="-52368" />
-      </provider>
-    </entry>
-    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/codecs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="309" selection-start-line="309" selection-end-line="309" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/testing.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="-104840">
-          <caret line="1" column="122237" selection-start-line="1" selection-start-column="122237" selection-end-line="1" selection-end-column="122237" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
@@ -564,31 +522,55 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/map_probabilities.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="32">
-          <caret line="1" column="39863" selection-start-line="1" selection-start-column="39863" selection-end-line="1" selection-end-column="39863" />
+    <entry file="file://$PROJECT_DIR$/beta_results">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="10" selection-start-line="9" selection-start-column="10" selection-end-line="9" selection-end-column="10" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/answers.csv">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
+        <state>
           <caret line="16" column="7" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="7" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/beta_results">
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/codecs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="10" lean-forward="true" selection-start-line="9" selection-start-column="10" selection-end-line="9" selection-end-column="10" />
+        <state relative-caret-position="4620">
+          <caret line="309" selection-start-line="309" selection-end-line="309" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/pandas/core/indexes/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="65100">
+          <caret line="4403" selection-start-line="4403" selection-end-line="4403" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testing.csv">
+      <provider selected="true" editor-type-id="LargeFileEditor">
+        <state>
+          <caret line="1" column="122237" selection-start-line="1" selection-start-column="122237" selection-end-line="1" selection-end-column="122237" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/training.csv">
+      <provider selected="true" editor-type-id="LargeFileEditor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/map_probabilities.csv">
+      <provider selected="true" editor-type-id="LargeFileEditor">
+        <state>
+          <caret line="1" column="39863" selection-start-line="1" selection-start-column="39863" selection-end-line="1" selection-end-column="39863" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ConstructionZone2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="232">
-          <caret line="19" column="32" selection-start-line="19" selection-start-column="32" selection-end-line="19" selection-end-column="32" />
+        <state relative-caret-position="255">
+          <caret line="20" selection-start-line="20" selection-end-line="21" selection-end-column="64" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>
@@ -597,14 +579,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="121" column="26" selection-start-line="121" selection-start-column="26" selection-end-line="121" selection-end-column="26" />
+        <state relative-caret-position="381">
+          <caret line="154" column="4" lean-forward="true" selection-start-line="154" selection-start-column="4" selection-end-line="154" selection-end-column="4" />
           <folding>
             <element signature="e#99#114#0" expanded="true" />
-            <marker date="1538108906000" expanded="true" signature="2623:2628" ph="..." />
-            <marker date="1538108906000" expanded="true" signature="2623:3585" ph="..." />
-            <marker date="1538108906000" expanded="true" signature="5183:5184" ph="..." />
-            <marker date="1538108906000" expanded="true" signature="5797:5802" ph="..." />
+            <marker date="1538198301000" expanded="true" signature="2623:2628" ph="..." />
+            <marker date="1538198301000" expanded="true" signature="2623:3585" ph="..." />
+            <marker date="1538198301000" expanded="true" signature="4932:4933" ph="..." />
+            <marker date="1538198301000" expanded="true" signature="6217:6292" ph="..." />
+            <marker date="1538198301000" expanded="true" signature="6326:6509" ph="..." />
+            <marker date="1538198301000" expanded="true" signature="6528:6533" ph="..." />
+            <marker date="1538198301000" expanded="true" signature="6528:6814" ph="..." />
           </folding>
         </state>
       </provider>

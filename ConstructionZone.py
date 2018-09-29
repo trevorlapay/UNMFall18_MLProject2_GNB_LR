@@ -80,12 +80,7 @@ def naiveBayesClassify(testingDf):
 
 # Generate a MAP dataframe for probabilites across classes and features.
 # This needs to be updated every time the beta value changes.
-def generateMAPmatrix():
-    vocabFile = open('vocabulary.txt', "r")
-    allWords = vocabFile.read().splitlines()
-    colNames = ['id'] + list(range(1, len(allWords) + 1)) + ['labelId']
-    trainingDf = pd.read_csv("training.csv", header=None,
-                           names=colNames).to_sparse(fill_value=0)
+def generateMAPmatrix(trainingDf):
     vocabFile = open('vocabulary.txt', "r")
     allWords = vocabFile.read().splitlines()
     listoflists = []
@@ -106,7 +101,7 @@ def generateMAPmatrix():
             denominator = totalWordsInClass + ((alpha - 1)*vocabularyLength)
             rowdata.append(numerator/denominator)
         listoflists.append(rowdata)
-    return pd.DataFrame(listoflists)
+    pd.DataFrame(listoflists).to_csv("map_probabilities.csv")
 
 def generateSubmissionFileNB(testingDataFile="testing.csv", answersDataFile="answers.csv"):
     vocabFile = open('vocabulary.txt', "r")
@@ -123,13 +118,45 @@ def plotBetaValues():
     plt.ylabel("Accuracy")
     plt.show()
 
+#classify against a testing set and chart how well the algorithm classified.
+def generateConfusionPlot(testingDf):
+    testingDf['predictedClass'] = naiveBayesClassify(testingDf)
+    listoflists = []
+    for numClass, newsgroup1 in enumerate(allLabels):
+        row = []
+        for numPredictedClass, newsgroup2 in enumerate(allLabels):
+            sum_match = len(testingDf.loc[(testingDf['labelId'] == (numClass + 1))
+                                                      & (testingDf['predictedClass']
+                                                         == (numPredictedClass + 1))])
+            row.append(sum_match)
+        listoflists.append(row)
+    print(listoflists)
+
+
+#split the training set into both a training and testing set at an index
+def splitTrainingTesting(splitAt):
+    trainingDfStart = loadTraining()
+    trainingDf = trainingDfStart[0:splitAt]
+    testingDf = trainingDfStart[splitAt + 1:len(trainingDfStart)]
+    return trainingDf, testingDf
+
+
+def loadTraining():
+    vocabFile = open('vocabulary.txt', "r")
+    allWords = vocabFile.read().splitlines()
+    colNames = ['id'] + list(range(1, len(allWords) + 1)) + ['labelId']
+    return pd.read_csv("training.csv", header=None,
+                             names=colNames).to_sparse(fill_value=0)
+
+
+
 def main():
-    # generateSparseFiles() - we should discuss how to do this. We may not want to use pandas...
-    # mapdf = generateMAPmatrix()
-    # mapdf.to_csv("map_probabilities.csv")
+    trainingDf, testingDf = splitTrainingTesting(1200)
+    generateMAPmatrix(trainingDf)
+    generateConfusionPlot(testingDf)
     # The classifier scores 100% against the training data (I didn't do any Beta-tuning yet)
     # generateSubmissionFileNB()
-    plotBetaValues()
+    # plotBetaValues()
 
 
 if __name__ == "__main__": main()
