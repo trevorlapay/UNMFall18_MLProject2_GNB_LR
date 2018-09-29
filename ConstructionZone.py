@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-
+import seaborn as sn
 
 # MAP constants
 classColumn = 61189
@@ -31,20 +31,10 @@ priors = [.04025, .052, .051833333333333335, .05358333333333333, .05016666666666
           .05408333333333333, .052333333333333336, .05383333333333333, .05325, .05216666666666667, .05175,
           .05308333333333334, .05425, .04833333333333333, .049416666666666664, .03891666666666667, .035583333333333335]
 
-# Accuracies at various beta levels for plotting.
+# Accuracies at various beta levels for plotting. Reference: full training set.
 beta_accuracies = [(.00001, .88367), (.000016, .88367), (.0001, .88957), (.001, .89371), (.01, .89784),
                         (.1, .89193), (.2, .88662), (.5, .87835), (.8, .86625), (1, .85562)]
 
-# Generate a dataframe for priors.
-# this should never change, so only do it once and store the values in an array.
-def generateMLEpriors(trainingDf):
-    # totalClasses = len(allClasses.index)
-    numDocs = len(trainingDf)
-    priors = []
-    for num in range(20):
-        prior = len(trainingDf.loc[trainingDf['labelId'] == (num+1)])/numDocs
-        priors.append(prior)
-    return priors
 
 # Approach: read from priors list and map probability files.
 # take the probability MAP matrix and apply log2 to all elements
@@ -59,13 +49,15 @@ def generateMLEpriors(trainingDf):
 #   should be the likeliest class for the element in the data.
 def naiveBayesClassify(testingDf):
     # take argmax of the probability of a test example belonging to a given class across all features.
-    # drop doc_id column.
-    testingDf = testingDf.drop('id', axis=1)
+    # drop doc_id column and label column.
+    testingDf = testingDf.drop('id', axis=1).drop('labelId', axis=1)
     probabilityMatrix = pd.read_csv("map_probabilities.csv", header=None).drop(0, axis=1).drop(0, axis=0)
     # apply log2 first for calculating log sums
     probabilityMatrix = probabilityMatrix.applymap(math.log2)
     calculated_probabilities = []
     classList = []
+    priors = pd.read_csv("priors.csv", header=None).iloc[:, 1].tolist()
+    print("priors: " + priors)
     # classes = rows in priors vector.
     # wondering how to do this with matrix multiplication. Too slow iteratively.
     for index, row in testingDf.iterrows():
@@ -75,6 +67,7 @@ def naiveBayesClassify(testingDf):
         classList.append((np.argmax(calculated_probabilities) + 1))
         calculated_probabilities = []
     labelCol = pd.Series(classList)
+    print(labelCol)
     return labelCol
 
 
@@ -83,16 +76,15 @@ def naiveBayesClassify(testingDf):
 def generateMAPmatrix(trainingDf):
     vocabFile = open('vocabulary.txt', "r")
     allWords = vocabFile.read().splitlines()
+    classWordCounts = pd.read_csv("label_counts.csv", header=None).iloc[:, 1].tolist()
+    print("cwc" + classWordCounts)
     listoflists = []
     for numClass, newsGroup in enumerate(allLabels):
         rowdata = []
-        totalWordsInClass = classWordCounts.get(numClass + 1)
+        totalWordsInClass = classWordCounts[numClass + 1]
         trainingDfByClass = trainingDf.loc[trainingDf['labelId'] == (numClass + 1)]
         for numWord, word  in enumerate(allWords):
             if len(trainingDfByClass) > 1:
-                # Counting the words in a class is too slow using dataframes.
-                # There is probably a faster way to do this (either that, or create a
-                # file that just stores these values in a vector or something)
                 countWordsinClass = trainingDfByClass[numWord+1].sum()
             else:
                 # don't skip zero counts since we are using MAP hallucinated values.
@@ -101,6 +93,7 @@ def generateMAPmatrix(trainingDf):
             denominator = totalWordsInClass + ((alpha - 1)*vocabularyLength)
             rowdata.append(numerator/denominator)
         listoflists.append(rowdata)
+    print("generated")
     pd.DataFrame(listoflists).to_csv("map_probabilities.csv")
 
 def generateSubmissionFileNB(testingDataFile="testing.csv", answersDataFile="answers.csv"):
@@ -120,7 +113,9 @@ def plotBetaValues():
 
 #classify against a testing set and chart how well the algorithm classified.
 def generateConfusionPlot(testingDf):
-    testingDf['predictedClass'] = naiveBayesClassify(testingDf)
+    labelCol = naiveBayesClassify(testingDf)
+    testingDf['predictedClass'] = labelCol.values
+    testingDf.drop(testingDf.columns.to_series()[1:61189], axis=1, inplace=True)
     listoflists = []
     for numClass, newsgroup1 in enumerate(allLabels):
         row = []
@@ -130,30 +125,79 @@ def generateConfusionPlot(testingDf):
                                                          == (numPredictedClass + 1))])
             row.append(sum_match)
         listoflists.append(row)
-    print(listoflists)
+
+    df_cm = pd.DataFrame(listoflists, range(20),
+                             range(20))
+    sn.heatmap(df_cm, annot=True)
+    plt.show()
 
 
-#split the training set into both a training and testing set at an index
+# split the training set into both a training and testing set at an index
+# currently these are split roughly in half. Run this to generate
+# large split files (these are not in the repo).
 def splitTrainingTesting(splitAt):
     trainingDfStart = loadTraining()
     trainingDf = trainingDfStart[0:splitAt]
     testingDf = trainingDfStart[splitAt + 1:len(trainingDfStart)]
+    trainingDf.to_csv("training_split.csv")
+    testingDf.to_csv("testing_split.csv")
     return trainingDf, testingDf
 
-
-def loadTraining():
+# loads the training file from csv. Either whole or the split version.
+def loadTraining(split=False):
     vocabFile = open('vocabulary.txt', "r")
     allWords = vocabFile.read().splitlines()
     colNames = ['id'] + list(range(1, len(allWords) + 1)) + ['labelId']
-    return pd.read_csv("training.csv", header=None,
+    if split:
+        trainingFile = "training_split.csv"
+
+    else:
+        trainingFile = "training.csv"
+
+    return pd.read_csv(trainingFile, header=None,
                              names=colNames).to_sparse(fill_value=0)
 
+# loads the training files and testing. Assume split.
+def loadTrainingAndTestingFromFile():
+    vocabFile = open('vocabulary.txt', "r")
+    allWords = vocabFile.read().splitlines()
+    colNames = ['id'] + list(range(1, len(allWords) + 1)) + ['labelId']
+    trainingDf = pd.read_csv("training_split.csv", header=None,
+                             names=colNames).to_sparse(fill_value=0)
+    testingDf = pd.read_csv("testing_split.csv", header=None,
+                             names=colNames).to_sparse(fill_value=0)
+    return trainingDf, testingDf
 
+# generate priors to file
+def generatePriors(trainingDf):
+    labelProportions = trainingDf['labelId'].value_counts(normalize=True)
+    labelProportions.to_csv("priors.csv")
+
+# generate the class counts for MAP matrix dynamically (do this when the training set changes)
+def generateClassCounts(trainingDf):
+    vocabFile = open('vocabulary.txt', "r")
+    allWords = vocabFile.read().splitlines()
+    vocabFile.close()
+    numWords = len(allWords)
+    allWordIds = list(range(1, numWords + 1))
+    labelWordSums = trainingDf.groupby('labelId')[allWordIds].agg(np.sum).to_sparse(fill_value=0)
+    labelSums = labelWordSums.sum(axis=1)
+    labelSums.to_csv("label_counts.csv")
+
+# regenerate all static data about the training set.
+# run this if you change the training set (i.e. run once after splitting the training set at a
+# given row index)
+def generateAll(trainingDf):
+    generateClassCounts(trainingDf)
+    generatePriors(trainingDf)
+    generateMAPmatrix(trainingDf)
 
 def main():
-    trainingDf, testingDf = splitTrainingTesting(1200)
+    # trainingDf, testingDf = splitTrainingTesting(1200)
+    trainingDf, testingDf = loadTrainingAndTestingFromFile(True)
     generateMAPmatrix(trainingDf)
     generateConfusionPlot(testingDf)
+    # generateClassCounts(trainingDf)
     # The classifier scores 100% against the training data (I didn't do any Beta-tuning yet)
     # generateSubmissionFileNB()
     # plotBetaValues()

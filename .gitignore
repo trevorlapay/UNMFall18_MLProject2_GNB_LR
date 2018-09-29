@@ -1,4 +1,6 @@
 # ignore large files
 testing.csv
 training.csv
+testing_split.csv
+training_split.csv
 answers.csv
