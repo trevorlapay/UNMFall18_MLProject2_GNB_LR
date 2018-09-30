@@ -189,13 +189,17 @@ def generateAll(trainingDf):
     generateClassCounts(trainingDf)
     generatePriors(trainingDf)
     generateMAPmatrix(trainingDf)
-    splitTrainingTesting(1200)
+    # splitTrainingTesting(1200)
 
 def main():
+    # plotBetaValues()
     # trainingDf, testingDf = splitTrainingTesting(1200) # do this if you need th split the data into test/train
-    trainingDf, testingDf = loadTrainingAndTestingFromFile()
-    generateMAPmatrix(trainingDf)
-    generateConfusionPlot(testingDf)
+    # trainingDf, testingDf = loadTrainingAndTestingFromFile()
+    # generateMAPmatrix(trainingDf)
+    # generateConfusionPlot(testingDf)
+    generateAll(loadTraining(False))
+    generateSubmissionFileNB()
+
 
 
 
