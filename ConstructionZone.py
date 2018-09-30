@@ -21,6 +21,7 @@ labelsFile = open('newsgrouplabels.txt', "r")
 allLabels = labelsFile.read().splitlines()
 
 # word counts won't change (unless we change the training set)
+# The following 2 constants are ONLY to be used with the entire training set, otherwise generate them from file..
 classWordCounts = dict([(1, 154382), (2, 138499), (3, 116141), (4, 103535), (5, 90456),
                         (6, 144656), (7, 64094), (8, 107399), (9, 110928), (10, 124537), (11, 143087),
                         (12, 191242), (13, 97924), (14, 158930), (15, 162521), (16, 236747), (17, 172257),
@@ -57,7 +58,6 @@ def naiveBayesClassify(testingDf):
     calculated_probabilities = []
     classList = []
     priors = pd.read_csv("priors.csv", header=None).iloc[:, 1].tolist()
-    print("priors: " + priors)
     # classes = rows in priors vector.
     # wondering how to do this with matrix multiplication. Too slow iteratively.
     for index, row in testingDf.iterrows():
@@ -77,11 +77,10 @@ def generateMAPmatrix(trainingDf):
     vocabFile = open('vocabulary.txt', "r")
     allWords = vocabFile.read().splitlines()
     classWordCounts = pd.read_csv("label_counts.csv", header=None).iloc[:, 1].tolist()
-    print("cwc" + classWordCounts)
     listoflists = []
     for numClass, newsGroup in enumerate(allLabels):
         rowdata = []
-        totalWordsInClass = classWordCounts[numClass + 1]
+        totalWordsInClass = classWordCounts[numClass-1]
         trainingDfByClass = trainingDf.loc[trainingDf['labelId'] == (numClass + 1)]
         for numWord, word  in enumerate(allWords):
             if len(trainingDfByClass) > 1:
@@ -93,7 +92,6 @@ def generateMAPmatrix(trainingDf):
             denominator = totalWordsInClass + ((alpha - 1)*vocabularyLength)
             rowdata.append(numerator/denominator)
         listoflists.append(rowdata)
-    print("generated")
     pd.DataFrame(listoflists).to_csv("map_probabilities.csv")
 
 def generateSubmissionFileNB(testingDataFile="testing.csv", answersDataFile="answers.csv"):
@@ -191,16 +189,14 @@ def generateAll(trainingDf):
     generateClassCounts(trainingDf)
     generatePriors(trainingDf)
     generateMAPmatrix(trainingDf)
+    splitTrainingTesting(1200)
 
 def main():
-    # trainingDf, testingDf = splitTrainingTesting(1200)
+    # trainingDf, testingDf = splitTrainingTesting(1200) # do this if you need th split the data into test/train
     trainingDf, testingDf = loadTrainingAndTestingFromFile()
     generateMAPmatrix(trainingDf)
     generateConfusionPlot(testingDf)
-    # generateClassCounts(trainingDf)
-    # The classifier scores 100% against the training data (I didn't do any Beta-tuning yet)
-    # generateSubmissionFileNB()
-    # plotBetaValues()
+
 
 
 if __name__ == "__main__": main()
