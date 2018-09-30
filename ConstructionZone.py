@@ -51,13 +51,13 @@ beta_accuracies = [(.00001, .88367), (.000016, .88367), (.0001, .88957), (.001, 
 def naiveBayesClassify(testingDf):
     # take argmax of the probability of a test example belonging to a given class across all features.
     # drop doc_id column and label column.
-    testingDf = testingDf.drop('id', axis=1).drop('labelId', axis=1)
+    testingDf = testingDf.drop('id', axis=1)
     probabilityMatrix = pd.read_csv("map_probabilities.csv", header=None).drop(0, axis=1).drop(0, axis=0)
     # apply log2 first for calculating log sums
     probabilityMatrix = probabilityMatrix.applymap(math.log2)
     calculated_probabilities = []
     classList = []
-    priors = pd.read_csv("priors.csv", header=None).iloc[:, 1].tolist()
+    # priors = pd.read_csv("priors.csv", header=None).iloc[:, 1].tolist()
     # classes = rows in priors vector.
     # wondering how to do this with matrix multiplication. Too slow iteratively.
     for index, row in testingDf.iterrows():
@@ -67,7 +67,6 @@ def naiveBayesClassify(testingDf):
         classList.append((np.argmax(calculated_probabilities) + 1))
         calculated_probabilities = []
     labelCol = pd.Series(classList)
-    print(labelCol)
     return labelCol
 
 
@@ -76,11 +75,12 @@ def naiveBayesClassify(testingDf):
 def generateMAPmatrix(trainingDf):
     vocabFile = open('vocabulary.txt', "r")
     allWords = vocabFile.read().splitlines()
-    classWordCounts = pd.read_csv("label_counts.csv", header=None).iloc[:, 1].tolist()
+    # use below if using something other than the full training set.
+    # classWordCounts = pd.read_csv("label_counts.csv", header=None).iloc[:, 1].tolist()
     listoflists = []
     for numClass, newsGroup in enumerate(allLabels):
         rowdata = []
-        totalWordsInClass = classWordCounts[numClass-1]
+        totalWordsInClass = classWordCounts.get(numClass + 1)
         trainingDfByClass = trainingDf.loc[trainingDf['labelId'] == (numClass + 1)]
         for numWord, word  in enumerate(allWords):
             if len(trainingDfByClass) > 1:
@@ -186,17 +186,14 @@ def generateClassCounts(trainingDf):
 # run this if you change the training set (i.e. run once after splitting the training set at a
 # given row index)
 def generateAll(trainingDf):
-    generateClassCounts(trainingDf)
-    generatePriors(trainingDf)
+    # If you're using the full training set, don't bother loading these from files.
+    # generateClassCounts(trainingDf)
+    # generatePriors(trainingDf)
     generateMAPmatrix(trainingDf)
+    # if you're loading the split files, create them with the below.
     # splitTrainingTesting(1200)
 
 def main():
-    # plotBetaValues()
-    # trainingDf, testingDf = splitTrainingTesting(1200) # do this if you need th split the data into test/train
-    # trainingDf, testingDf = loadTrainingAndTestingFromFile()
-    # generateMAPmatrix(trainingDf)
-    # generateConfusionPlot(testingDf)
     generateAll(loadTraining(False))
     generateSubmissionFileNB()
 

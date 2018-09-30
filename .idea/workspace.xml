@@ -4,6 +4,10 @@
     <list default="true" id="0eefa4ce-e9ea-44b9-8f02-c3423378e1af" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ConstructionZone.py" beforeDir="false" afterPath="$PROJECT_DIR$/ConstructionZone.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/label_counts.csv" beforeDir="false" afterPath="$PROJECT_DIR$/label_counts.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/map_probabilities.csv" beforeDir="false" afterPath="$PROJECT_DIR$/map_probabilities.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/newsgrouplabels.txt" beforeDir="false" afterPath="$PROJECT_DIR$/newsgrouplabels.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/priors.csv" beforeDir="false" afterPath="$PROJECT_DIR$/priors.csv" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,6 +32,7 @@
           <entry key="csv" value="21" />
           <entry key="gitignore" value="3" />
           <entry key="md" value="6" />
+          <entry key="png" value="2" />
           <entry key="py" value="11" />
           <entry key="txt" value="6" />
         </counts>
@@ -35,6 +40,7 @@
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="CSV" value="4" />
+          <entry key="Image" value="2" />
           <entry key="Markdown" value="6" />
           <entry key="PLAIN_TEXT" value="27" />
           <entry key="Python" value="11" />
@@ -45,13 +51,13 @@
           <entry key="beta_results" value="154" />
           <entry key="csv" value="7" />
           <entry key="gitignore" value="71" />
-          <entry key="py" value="11480" />
+          <entry key="py" value="11774" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="232" />
-          <entry key="Python" value="11480" />
+          <entry key="Python" value="11774" />
         </counts>
       </usages-collector>
     </session>
@@ -61,29 +67,38 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1017">
-              <caret line="200" column="30" selection-start-line="200" selection-start-column="30" selection-end-line="200" selection-end-column="30" />
+            <state relative-caret-position="196">
+              <caret line="192" column="68" selection-start-line="192" selection-start-column="68" selection-end-line="192" selection-end-column="68" />
               <folding>
                 <element signature="e#99#114#0" expanded="true" />
-                <marker date="1538270158000" expanded="true" signature="2396:2401" ph="..." />
-                <marker date="1538270158000" expanded="true" signature="2396:3491" ph="..." />
-                <marker date="1538270158000" expanded="true" signature="4676:4677" ph="..." />
-                <marker date="1538270158000" expanded="true" signature="6189:6380" ph="..." />
-                <marker date="1538270158000" expanded="true" signature="6414:6753" ph="..." />
-                <marker date="1538270158000" expanded="true" signature="6783:6788" ph="..." />
-                <marker date="1538270158000" expanded="true" signature="6783:8730" ph="..." />
-                <marker date="1538270158000" expanded="true" signature="8741:8746" ph="..." />
-                <marker date="1538270158000" expanded="true" signature="8741:8769" ph="..." />
+                <marker date="1538280193000" expanded="true" signature="2396:2401" ph="..." />
+                <marker date="1538280193000" expanded="true" signature="2396:3449" ph="..." />
+                <marker date="1538280193000" expanded="true" signature="4711:4712" ph="..." />
+                <marker date="1538280193000" expanded="true" signature="6224:6415" ph="..." />
+                <marker date="1538280193000" expanded="true" signature="6449:6788" ph="..." />
+                <marker date="1538280193000" expanded="true" signature="6818:6823" ph="..." />
+                <marker date="1538280193000" expanded="true" signature="6818:8922" ph="..." />
+                <marker date="1538280193000" expanded="true" signature="8933:8938" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/confusion_matrix_1200split.png">
+          <provider selected="true" editor-type-id="images" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/beta_values.png">
+          <provider selected="true" editor-type-id="images" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/newsgrouplabels.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" column="14" selection-start-line="6" selection-start-column="14" selection-end-line="6" selection-end-column="14" />
+            <state relative-caret-position="135">
+              <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -112,35 +127,25 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/label_counts.csv">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="13" column="8" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="8" />
+            <state relative-caret-position="240">
+              <caret line="16" column="9" selection-start-line="16" selection-start-column="9" selection-end-line="16" selection-end-column="9" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/priors.csv">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/pandas/core/sparse/frame.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="10170">
-              <caret line="702" selection-start-line="702" selection-end-line="702" />
+            <state relative-caret-position="195">
+              <caret line="13" column="19" selection-start-line="13" selection-start-column="19" selection-end-line="13" selection-end-column="19" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/training.csv">
-          <provider selected="true" editor-type-id="LargeFileEditor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/map_probabilities.csv">
           <provider selected="true" editor-type-id="LargeFileEditor">
-            <state relative-caret-position="-4785">
+            <state relative-caret-position="33615">
               <caret line="1" column="39863" selection-start-line="1" selection-start-column="39863" selection-end-line="1" selection-end-column="39863" />
             </state>
           </provider>
@@ -186,6 +191,8 @@
       <find>fromfil</find>
       <find>splitTrainingTesting</find>
       <find>eta</find>
+      <find>num</find>
+      <find>allLabels</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -556,9 +563,6 @@
     <entry file="file://$PROJECT_DIR$/training.csv">
       <provider selected="true" editor-type-id="LargeFileEditor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/priors.csv">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/ConstructionZone2.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="465">
@@ -566,20 +570,6 @@
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/label_counts.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="8" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/map_probabilities.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="-4785">
-          <caret line="1" column="39863" selection-start-line="1" selection-start-column="39863" selection-end-line="1" selection-end-column="39863" />
         </state>
       </provider>
     </entry>
@@ -600,28 +590,54 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/beta_values.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/confusion_matrix_1200split.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/map_probabilities.csv">
+      <provider selected="true" editor-type-id="LargeFileEditor">
+        <state relative-caret-position="33615">
+          <caret line="1" column="39863" selection-start-line="1" selection-start-column="39863" selection-end-line="1" selection-end-column="39863" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/priors.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="19" selection-start-line="13" selection-start-column="19" selection-end-line="13" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/newsgrouplabels.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="14" selection-start-line="6" selection-start-column="14" selection-end-line="6" selection-end-column="14" />
+        <state relative-caret-position="135">
+          <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/label_counts.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="9" selection-start-line="16" selection-start-column="9" selection-end-line="16" selection-end-column="9" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1017">
-          <caret line="200" column="30" selection-start-line="200" selection-start-column="30" selection-end-line="200" selection-end-column="30" />
+        <state relative-caret-position="196">
+          <caret line="192" column="68" selection-start-line="192" selection-start-column="68" selection-end-line="192" selection-end-column="68" />
           <folding>
             <element signature="e#99#114#0" expanded="true" />
-            <marker date="1538270158000" expanded="true" signature="2396:2401" ph="..." />
-            <marker date="1538270158000" expanded="true" signature="2396:3491" ph="..." />
-            <marker date="1538270158000" expanded="true" signature="4676:4677" ph="..." />
-            <marker date="1538270158000" expanded="true" signature="6189:6380" ph="..." />
-            <marker date="1538270158000" expanded="true" signature="6414:6753" ph="..." />
-            <marker date="1538270158000" expanded="true" signature="6783:6788" ph="..." />
-            <marker date="1538270158000" expanded="true" signature="6783:8730" ph="..." />
-            <marker date="1538270158000" expanded="true" signature="8741:8746" ph="..." />
-            <marker date="1538270158000" expanded="true" signature="8741:8769" ph="..." />
+            <marker date="1538280193000" expanded="true" signature="2396:2401" ph="..." />
+            <marker date="1538280193000" expanded="true" signature="2396:3449" ph="..." />
+            <marker date="1538280193000" expanded="true" signature="4711:4712" ph="..." />
+            <marker date="1538280193000" expanded="true" signature="6224:6415" ph="..." />
+            <marker date="1538280193000" expanded="true" signature="6449:6788" ph="..." />
+            <marker date="1538280193000" expanded="true" signature="6818:6823" ph="..." />
+            <marker date="1538280193000" expanded="true" signature="6818:8922" ph="..." />
+            <marker date="1538280193000" expanded="true" signature="8933:8938" ph="..." />
           </folding>
         </state>
       </provider>
