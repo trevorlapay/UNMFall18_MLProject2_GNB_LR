@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0eefa4ce-e9ea-44b9-8f02-c3423378e1af" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/ConstructionZone_Logistic.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ConstructionZone.py" beforeDir="false" afterPath="$PROJECT_DIR$/ConstructionZone.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/label_counts.csv" beforeDir="false" afterPath="$PROJECT_DIR$/label_counts.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/map_probabilities.csv" beforeDir="false" afterPath="$PROJECT_DIR$/map_probabilities.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/newsgrouplabels.txt" beforeDir="false" afterPath="$PROJECT_DIR$/newsgrouplabels.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/priors.csv" beforeDir="false" afterPath="$PROJECT_DIR$/priors.csv" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -29,21 +25,21 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="beta_results" value="1" />
-          <entry key="csv" value="21" />
+          <entry key="csv" value="22" />
           <entry key="gitignore" value="3" />
           <entry key="md" value="6" />
           <entry key="png" value="2" />
-          <entry key="py" value="11" />
+          <entry key="py" value="12" />
           <entry key="txt" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="CSV" value="4" />
+          <entry key="CSV" value="5" />
           <entry key="Image" value="2" />
           <entry key="Markdown" value="6" />
           <entry key="PLAIN_TEXT" value="27" />
-          <entry key="Python" value="11" />
+          <entry key="Python" value="12" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
@@ -51,36 +47,57 @@
           <entry key="beta_results" value="154" />
           <entry key="csv" value="7" />
           <entry key="gitignore" value="71" />
-          <entry key="py" value="11774" />
+          <entry key="py" value="12297" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="232" />
-          <entry key="Python" value="11774" />
+          <entry key="Python" value="12297" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="196">
-              <caret line="192" column="68" selection-start-line="192" selection-start-column="68" selection-end-line="192" selection-end-column="68" />
+            <state relative-caret-position="365">
+              <caret line="94" column="61" lean-forward="true" selection-start-line="94" selection-start-column="4" selection-end-line="94" selection-end-column="61" />
               <folding>
                 <element signature="e#99#114#0" expanded="true" />
-                <marker date="1538280193000" expanded="true" signature="2396:2401" ph="..." />
-                <marker date="1538280193000" expanded="true" signature="2396:3449" ph="..." />
-                <marker date="1538280193000" expanded="true" signature="4711:4712" ph="..." />
-                <marker date="1538280193000" expanded="true" signature="6224:6415" ph="..." />
-                <marker date="1538280193000" expanded="true" signature="6449:6788" ph="..." />
-                <marker date="1538280193000" expanded="true" signature="6818:6823" ph="..." />
-                <marker date="1538280193000" expanded="true" signature="6818:8922" ph="..." />
-                <marker date="1538280193000" expanded="true" signature="8933:8938" ph="..." />
+                <marker date="1538445656000" expanded="true" signature="2396:2401" ph="..." />
+                <marker date="1538445656000" expanded="true" signature="2396:3449" ph="..." />
+                <marker date="1538445656000" expanded="true" signature="4711:4712" ph="..." />
+                <marker date="1538445656000" expanded="true" signature="6224:6415" ph="..." />
+                <marker date="1538445656000" expanded="true" signature="6449:6788" ph="..." />
+                <marker date="1538445656000" expanded="true" signature="6818:6823" ph="..." />
+                <marker date="1538445656000" expanded="true" signature="6818:8922" ph="..." />
+                <marker date="1538445656000" expanded="true" signature="8933:8938" ph="..." />
               </folding>
             </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ConstructionZone_Logistic.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="239">
+              <caret line="49" column="50" selection-start-line="49" selection-start-column="50" selection-end-line="49" selection-end-column="50" />
+              <folding>
+                <element signature="e#99#114#0" expanded="true" />
+                <marker date="1538452024000" expanded="true" signature="1407:1966" ph="..." />
+                <marker date="1538452024000" expanded="true" signature="5253:5285" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/delta_matrix.csv">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1138" />
           </provider>
         </entry>
       </file>
@@ -97,17 +114,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/newsgrouplabels.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vocabulary.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135960">
-              <caret line="9064" column="6" selection-start-line="9064" selection-start-column="6" selection-end-line="9064" selection-end-column="6" />
+            <state relative-caret-position="270">
+              <caret line="18" column="21" selection-start-line="18" selection-start-column="21" selection-end-line="18" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -151,18 +159,6 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ConstructionZone2.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="465">
-              <caret line="31" column="3" selection-start-line="31" selection-end-line="31" selection-end-column="37" />
-              <folding>
-                <element signature="e#0#21#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -193,6 +189,9 @@
       <find>eta</find>
       <find>num</find>
       <find>allLabels</find>
+      <find>newsg</find>
+      <find>news</find>
+      <find>listofl</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -209,6 +208,7 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/newsgrouplabels.txt" />
         <option value="$PROJECT_DIR$/ConstructionZone.py" />
+        <option value="$PROJECT_DIR$/ConstructionZone_Logistic.py" />
       </list>
     </option>
   </component>
@@ -252,7 +252,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.ConstructionZone">
+  <component name="RunManager" selected="Python.ConstructionZone_Logistic">
     <configuration name="ConstructionZone" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="UNMFall18_ML_Project2_NB_LR" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -295,12 +295,35 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="ConstructionZone_Logistic" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="UNMFall18_ML_Project2_NB_LR" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ConstructionZone_Logistic.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Python.ConstructionZone" />
       <item itemvalue="Python.ConstructionZone2" />
+      <item itemvalue="Python.ConstructionZone_Logistic" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.ConstructionZone_Logistic" />
         <item itemvalue="Python.ConstructionZone" />
         <item itemvalue="Python.ConstructionZone2" />
       </list>
@@ -610,13 +633,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/newsgrouplabels.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/label_counts.csv">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
@@ -624,22 +640,46 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/newsgrouplabels.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" column="21" selection-start-line="18" selection-start-column="21" selection-end-line="18" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ConstructionZone.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="192" column="68" selection-start-line="192" selection-start-column="68" selection-end-line="192" selection-end-column="68" />
+        <state relative-caret-position="365">
+          <caret line="94" column="61" lean-forward="true" selection-start-line="94" selection-start-column="4" selection-end-line="94" selection-end-column="61" />
           <folding>
             <element signature="e#99#114#0" expanded="true" />
-            <marker date="1538280193000" expanded="true" signature="2396:2401" ph="..." />
-            <marker date="1538280193000" expanded="true" signature="2396:3449" ph="..." />
-            <marker date="1538280193000" expanded="true" signature="4711:4712" ph="..." />
-            <marker date="1538280193000" expanded="true" signature="6224:6415" ph="..." />
-            <marker date="1538280193000" expanded="true" signature="6449:6788" ph="..." />
-            <marker date="1538280193000" expanded="true" signature="6818:6823" ph="..." />
-            <marker date="1538280193000" expanded="true" signature="6818:8922" ph="..." />
-            <marker date="1538280193000" expanded="true" signature="8933:8938" ph="..." />
+            <marker date="1538445656000" expanded="true" signature="2396:2401" ph="..." />
+            <marker date="1538445656000" expanded="true" signature="2396:3449" ph="..." />
+            <marker date="1538445656000" expanded="true" signature="4711:4712" ph="..." />
+            <marker date="1538445656000" expanded="true" signature="6224:6415" ph="..." />
+            <marker date="1538445656000" expanded="true" signature="6449:6788" ph="..." />
+            <marker date="1538445656000" expanded="true" signature="6818:6823" ph="..." />
+            <marker date="1538445656000" expanded="true" signature="6818:8922" ph="..." />
+            <marker date="1538445656000" expanded="true" signature="8933:8938" ph="..." />
           </folding>
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ConstructionZone_Logistic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="239">
+          <caret line="49" column="50" selection-start-line="49" selection-start-column="50" selection-end-line="49" selection-end-column="50" />
+          <folding>
+            <element signature="e#99#114#0" expanded="true" />
+            <marker date="1538452024000" expanded="true" signature="1407:1966" ph="..." />
+            <marker date="1538452024000" expanded="true" signature="5253:5285" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/delta_matrix.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1138" />
       </provider>
     </entry>
   </component>
