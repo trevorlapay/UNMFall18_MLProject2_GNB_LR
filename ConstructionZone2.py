@@ -4,15 +4,14 @@ import numpy as np
 import pickle
 import time
 
-npzFileName = "ConstructionZone2Vars.npz"
 pklFileName = "ConstructionZone2Vars.pkl"
-sTime = time.time()
 
 try:
     # True  -> start from scratch
     # False -> load from file
     if False: raise Exception()
     
+    sTime = time.time()
     with open(pklFileName, 'rb') as pklFile:
         (allClasses,
             allClassIDs,
@@ -22,7 +21,9 @@ try:
             classDocCounts,
             classProportions,
             wordCountsInClasses,
-            totalWordsInClasses) = pickle.load(pklFile)
+            totalWordsInClasses,
+            testingDocIDs,
+            testingMatrix) = pickle.load(pklFile)
         pklFile.close()
         print("Loaded variables in "+str(time.time()-sTime))
 except Exception as err:
@@ -30,9 +31,9 @@ except Exception as err:
     print(type(err))
     print(err.args)
     print(err)
-    print("Attempting to read raw data instead.")
-    sTime = time.time()
+    print("\nAttempting to read raw data instead.")
     try:
+        sTime = time.time()
         classesFile = open('newsgrouplabels.txt', 'r')
         allClasses = classesFile.read().splitlines()
         classesFile.close()
@@ -41,8 +42,8 @@ except Exception as err:
         print("Could not read news groups from newsgrouplabels.txt.")
         raise
     allClassIDs = list(range(1,len(allClasses)+1))
-    sTime = time.time()
     try:
+        sTime = time.time()
         vocabFile = open('vocabulary.txt', 'r')
         allWords = vocabFile.read().splitlines()
         vocabFile.close()
@@ -58,25 +59,45 @@ except Exception as err:
     colNames = ['docID']+allWordIDs+['classID']
     print("Created colNames in "+str(time.time()-sTime))
     
-    sTime = time.time()
     try:
-        trainingDf = pd.read_csv('training.csv',header=None,dtype=np.int32,
+        sTime = time.time()
+        trainingDF = pd.read_csv('training.csv',header=None,dtype=np.int32,
                                  names=colNames).to_sparse(fill_value=0)
-        print("Read trainingDf in "+str(time.time()-sTime))
+        print("Read trainingDF in "+str(time.time()-sTime))
     except:
         print("Could not read training data from training.csv.")
         raise
+    
     sTime = time.time()
-    docsGroupedByClass = trainingDf.groupby('classID')[allWordIDs]
+    docsGroupedByClass = trainingDF.groupby('classID')[allWordIDs]
     classMatixes = [sp.sparse.csr_matrix(docsGroupedByClass.get_group(classID)) for classID in allClassIDs]
     print("Created classMatixes in "+str(time.time()-sTime))
     
-    colNames = None
-    del colNames
-    trainingDf = None
-    del trainingDf
+    trainingDF = None
+    del trainingDF
     docsGroupedByClass = None
     del docsGroupedByClass
+    
+    try:
+        sTime = time.time()
+        testingDF = pd.read_csv('testing.csv',header=None,dtype=np.int32,
+                                 names=colNames[:-1]).to_sparse(fill_value=0)
+        print("Read testingDF in "+str(time.time()-sTime))
+    except:
+        print("Could not read testing data from testing.csv.")
+        raise
+    
+    sTime = time.time()
+    testingDocIDs = testingDF['docID'].tolist()
+    print("Created testingDocIDs in "+str(time.time()-sTime))
+    sTime = time.time()
+    testingMatrix = sp.sparse.csr_matrix(testingDF[colNames[1:-1]])
+    print("Created testingMatrix in "+str(time.time()-sTime))
+    
+    colNames = None
+    del colNames
+    testingDF = None
+    del testingDF
     
     sTime = time.time()
     classDocCounts = [classMatrix.shape[0] for classMatrix in classMatixes]
@@ -105,6 +126,19 @@ except Exception as err:
                         classDocCounts,
                         classProportions,
                         wordCountsInClasses,
-                        totalWordsInClasses], pklFile)
+                        totalWordsInClasses,
+                        testingDocIDs,
+                        testingMatrix], pklFile)
         pklFile.close()
         print("Dumped variables in "+str(time.time()-sTime))
+
+
+sTime = time.time()
+#for beta in np.linspace(0,1,1000):
+beta = .01 # This is the best preforming beta value Trevor found.
+alpha = 1 + beta
+temp = (alpha-1)*len(allWords)
+mapMmatrix = [ (wordCountsInClasses[classID-1]+(alpha-1))/(totalWordsInClasses[classID-1]+temp) for classID in allClassIDs ]
+print("Calculated mapMmatrix in "+str(time.time()-sTime))
+
+
