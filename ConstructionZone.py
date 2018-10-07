@@ -91,11 +91,11 @@ def generateMAPmatrix(trainingDf):
         trainingDfByClass = trainingDf.loc[trainingDf['labelId'] == (numClass + 1)]
         for numWord, word  in enumerate(allWords):
             if len(trainingDfByClass) > 1:
-                countWordsinClass = trainingDfByClass[numWord+1].sum()
+                countWordinClass = trainingDfByClass[numWord+1].sum()
             else:
                 # don't skip zero counts since we are using MAP hallucinated values.
-                countWordsinClass = totalWordsInClass = 0
-            numerator = countWordsinClass + alpha - 1
+                countWordinClass = totalWordsInClass = 0
+            numerator = countWordinClass + alpha - 1
             denominator = totalWordsInClass + ((alpha - 1)*vocabularyLength)
             rowdata.append(numerator/denominator)
         listoflists.append(rowdata)
@@ -155,7 +155,6 @@ def loadTraining(split=False):
     colNames = ['id'] + list(range(1, len(allWords) + 1)) + ['labelId']
     if split:
         trainingFile = "training_split.csv"
-
     else:
         trainingFile = "training.csv"
 
