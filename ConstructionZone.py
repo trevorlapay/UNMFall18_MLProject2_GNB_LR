@@ -15,26 +15,33 @@ import seaborn as sn
 # MAP constants
 classColumn = 61189
 vocabularyLength = 61188
+# Instructions say to make beta = 1/vocabularyLength
 beta = .01
 alpha = 1 + beta
-labelsFile = open('newsgrouplabels.txt', "r")
-allLabels = labelsFile.read().splitlines()
+classesFile = open('newsgrouplabels.txt', "r")
+allClasses = classesFile.read().splitlines()
 
 # word counts won't change (unless we change the training set)
-# The following 2 constants are ONLY to be used with the entire training set, otherwise generate them from file..
-classWordCounts = dict([(1, 154382), (2, 138499), (3, 116141), (4, 103535), (5, 90456),
-                        (6, 144656), (7, 64094), (8, 107399), (9, 110928), (10, 124537), (11, 143087),
-                        (12, 191242), (13, 97924), (14, 158930), (15, 162521), (16, 236747), (17, 172257),
-                        (18, 280067), (19, 172670), (20, 135764)])
+# The following 2 constants are ONLY to be used with the entire training set,
+#  otherwise generate them from file..
+classWordCounts = dict([(1, 154382), (2, 138499), (3, 116141), (4, 103535),
+                        (5, 90456), (6, 144656), (7, 64094), (8, 107399), 
+                        (9, 110928), (10, 124537), (11, 143087), (12, 191242),
+                        (13, 97924), (14, 158930), (15, 162521), (16, 236747),
+                        (17, 172257), (18, 280067), (19, 172670), (20, 135764)])
 
 # Priors (these won't change unless we change the training set)
-priors = [.04025, .052, .051833333333333335, .05358333333333333, .050166666666666665, .0525, .0515, .051166666666666666,
-          .05408333333333333, .052333333333333336, .05383333333333333, .05325, .05216666666666667, .05175,
-          .05308333333333334, .05425, .04833333333333333, .049416666666666664, .03891666666666667, .035583333333333335]
+priors = [.04025, .052, .051833333333333335, .05358333333333333, 
+          .050166666666666665, .0525, .0515, .051166666666666666,
+          .05408333333333333, .052333333333333336, .05383333333333333, .05325,
+          .05216666666666667, .05175, .05308333333333334, .05425, 
+          .04833333333333333, .049416666666666664, .03891666666666667, 
+          .035583333333333335]
 
 # Accuracies at various beta levels for plotting. Reference: full training set.
-beta_accuracies = [(.00001, .88367), (.000016, .88367), (.0001, .88957), (.001, .89371), (.01, .89784),
-                        (.1, .89193), (.2, .88662), (.5, .87835), (.8, .86625), (1, .85562)]
+beta_accuracies = [(.00001, .88367), (.000016, .88367), (.0001, .88957), 
+                   (.001, .89371), (.01, .89784), (.1, .89193), (.2, .88662), 
+                   (.5, .87835), (.8, .86625), (1, .85562)]
 
 
 # Approach: read from priors list and map probability files.
@@ -78,7 +85,7 @@ def generateMAPmatrix(trainingDf):
     # use below if using something other than the full training set.
     # classWordCounts = pd.read_csv("label_counts.csv", header=None).iloc[:, 1].tolist()
     listoflists = []
-    for numClass, newsGroup in enumerate(allLabels):
+    for numClass, newsGroup in enumerate(allClasses):
         rowdata = []
         totalWordsInClass = classWordCounts.get(numClass + 1)
         trainingDfByClass = trainingDf.loc[trainingDf['labelId'] == (numClass + 1)]
@@ -115,9 +122,9 @@ def generateConfusionPlot(testingDf):
     testingDf['predictedClass'] = labelCol.values
     testingDf.drop(testingDf.columns.to_series()[1:61189], axis=1, inplace=True)
     listoflists = []
-    for numClass, newsgroup1 in enumerate(allLabels):
+    for numClass, newsgroup1 in enumerate(allClasses):
         row = []
-        for numPredictedClass, newsgroup2 in enumerate(allLabels):
+        for numPredictedClass, newsgroup2 in enumerate(allClasses):
             sum_match = len(testingDf.loc[(testingDf['labelId'] == (numClass + 1))
                                                       & (testingDf['predictedClass']
                                                          == (numPredictedClass + 1))])
