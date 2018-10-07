@@ -6,3 +6,4 @@ training_split.csv
 answers.csv
 *.gdoc
 *.npz
+*.pkl
