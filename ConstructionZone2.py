@@ -5,8 +5,11 @@ import scipy as sp
 import numpy as np
 import pandas as pd
 import random
+import math
 
 pklFileName = "ConstructionZone2Vars.pkl"
+
+def nowStr(): return time.strftime("%Y-%m-%d_%H-%M-%S")
 
 #%% Define data splitting functions.
 def getSubset(examples, rows):
@@ -146,12 +149,24 @@ except Exception as err:
         pklFile.close()
         print("Dumped variables in "+str(time.time()-sTime))
 
-#%% Naive Bayes
+#%% Naive Bayes Learning
 sTime = time.time()
 #for beta in np.linspace(0,1,1000):
 beta = .01 # This is the best preforming beta value Trevor found.
 alpha = 1 + beta
 temp = (alpha-1)*len(allWords)
-mapMmatrix = [(wordCountsInClasses[classID-1]+(alpha-1))/(totalWordsInClasses[classID-1]+temp)
-              for classID in allClasses.keys()]
+mapMmatrix = np.array([(wordCountsInClasses[classID-1]+(alpha-1))/(totalWordsInClasses[classID-1]+temp)
+              for classID in allClasses.keys()])
 print("Calculated mapMmatrix in "+str(time.time()-sTime))
+
+mapMmatrixLog = np.vectorize(math.log2)(mapMmatrix)
+
+#%% Naive Bayes Testing
+likelyhoods = testingData[1].dot(mapMmatrixLog.transpose())
+b = np.repeat(np.array([list(allClasses.keys())]), len(likelyhoods), axis=0)
+mostLikely = b[np.arange(len(likelyhoods)), np.argmax(likelyhoods, axis=1)]
+
+answersDF = pd.DataFrame()
+answersDF['id'] = pd.Series(testingData[0])
+answersDF['class'] = pd.Series(mostLikely)
+answersDF.to_csv(nowStr()+'answers.csv', index=False)
