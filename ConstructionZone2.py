@@ -162,11 +162,16 @@ print("Calculated mapMmatrix in "+str(time.time()-sTime))
 mapMmatrixLog = np.vectorize(math.log2)(mapMmatrix)
 
 #%% Naive Bayes Testing
+sTime = time.time()
 likelyhoods = testingData[1].dot(mapMmatrixLog.transpose())
 b = np.repeat(np.array([list(allClasses.keys())]), len(likelyhoods), axis=0)
 mostLikely = b[np.arange(len(likelyhoods)), np.argmax(likelyhoods, axis=1)]
+print("Calculated mostLikely in "+str(time.time()-sTime))
 
+#%% Naive Bayes Testing Submission File
+sTime = time.time()
 answersDF = pd.DataFrame()
 answersDF['id'] = pd.Series(testingData[0])
 answersDF['class'] = pd.Series(mostLikely)
 answersDF.to_csv(nowStr()+'answers.csv', index=False)
+print("Wrote submission file in "+str(time.time()-sTime))
