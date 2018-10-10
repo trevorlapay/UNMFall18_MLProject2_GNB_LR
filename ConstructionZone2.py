@@ -9,44 +9,25 @@ import math
 
 pklFileName = "ConstructionZone2Vars.pkl"
 
+#%% Define time related itmes
+sTime = time.time()
+def reportRunTime(taskStr):
+    global sTime
+    print(taskStr + " in "+str(time.time()-sTime))
+    sTime = time.time()
 def nowStr(): return time.strftime("%Y-%m-%d_%H-%M-%S")
-
-#%% Define data splitting functions.
-def getSubset(examples, rows):
-    docIDs, mat = examples
-    return [docIDs[row] for row in rows], mat[rows,:]
-
-def splitExamples(examples, splitPorportion = 0.5):
-    docIDs, mat = examples
-    rows = list(range(len(docIDs)))
-    random.shuffle(rows)
-    splitIndex = round(splitPorportion*len(docIDs))
-    return getSubset(examples, rows[:splitIndex]), getSubset(examples, rows[splitIndex:])
-
-def splitClassExamples(classExamples, splitPorportion = 0.5):
-    subSet1 = {}
-    subSet2 = {}
-    for classID, examples in classExamples.items():
-        subSet1[classID], subSet2[classID] = splitExamples(examples, splitPorportion)
-    return subSet1, subSet2
-
 #%% Load basic data (previously read, dirived and saved).
 try:
     # True  -> start from scratch
     # False -> load from file
     if False: raise Exception()
-    sTime = time.time()
     with open(pklFileName, 'rb') as pklFile:
         (allClasses,
          allWords,
          allClassExamples,
-         testingData,
-         classDocCounts,
-         classProportions,
-         wordCountsInClasses,
-         totalWordsInClasses) = pickle.load(pklFile)
+         testingData) = pickle.load(pklFile)
         pklFile.close()
-        print("Loaded variables in "+str(time.time()-sTime))
+        reportRunTime("Loaded variables")
 except Exception as err:
     print("Could not load variables from pkl file. Error details:")
     print(type(err))
@@ -55,123 +36,132 @@ except Exception as err:
     print("\nAttempting to read raw data instead.\nAll runtimes given in seconds.")
     #%% Read in allClasses.
     try:
-        sTime = time.time()
         classesFile = open('newsgrouplabels.txt', 'r')
         allClasses = classesFile.read().splitlines()
         classesFile.close()
         allClasses = dict(zip(range(1, len(allClasses)+1), allClasses))
-        print("Read allClasses in "+str(time.time()-sTime))
+        reportRunTime("Read allClasses")
     except:
         print("Could not read news groups from newsgrouplabels.txt.")
         raise
     #%% Read in allWords.
     try:
-        sTime = time.time()
         vocabFile = open('vocabulary.txt', 'r')
         allWords = vocabFile.read().splitlines()
         vocabFile.close()
         allWords = dict(zip(range(1, len(allWords)+1), allWords))
-        print("Read allWords in "+str(time.time()-sTime))
+        reportRunTime("Read allWords")
     except:
         print("Could not read vocabulary from vocabulary.txt.")
         raise
     #%% Create colNames.
-    sTime = time.time()
     colNames = ['docID']+list(allWords.keys())+['classID']
-    print("Created colNames in "+str(time.time()-sTime))
+    reportRunTime("Created colNames")
     #%% Read trainingDF.
     try:
-        sTime = time.time()
         trainingDF = pd.read_csv('training.csv', header=None, dtype=np.int32,
                                  names=colNames).to_sparse(fill_value=0)
-        print("Read trainingDF in "+str(time.time()-sTime))
+        reportRunTime("Read trainingDF")
     except:
         print("Could not read training data from training.csv.")
         raise
     #%% Create allClassExamples.
-    sTime = time.time()
-#    docsGroupedByClass = trainingDF.groupby('classID')[list(allWords.keys())]
-#    classMatixes = [sp.sparse.csr_matrix(docsGroupedByClass.get_group(classID))
-#                    for classID in allClasses.keys()]
     allClassExamples = {classID : (list(examples['docID']),
                                 sp.sparse.csr_matrix(examples[list(allWords.keys())]))
         for classID, examples in trainingDF.groupby('classID')}
-    print("Created allClassExamples in "+str(time.time()-sTime))
-#    trainingDF = None
-#    del trainingDF
-#    docsGroupedByClass = None
-#    del docsGroupedByClass
+    reportRunTime("Created allClassExamples")
+    trainingDF = None
+    del trainingDF
+    docsGroupedByClass = None
+    del docsGroupedByClass
     #%% Read testingDF.
     try:
-        sTime = time.time()
         testingDF = pd.read_csv('testing.csv', header=None, dtype=np.int32,
                                 names=colNames[:-1]).to_sparse(fill_value=0)
-        print("Read testingDF in "+str(time.time()-sTime))
+        reportRunTime("Read testingDF")
     except:
         print("Could not read testing data from testing.csv.")
         raise
     #%% Create testingData
-    sTime = time.time()
     testingData = (testingDF['docID'].tolist(), sp.sparse.csr_matrix(testingDF[colNames[1:-1]]))
-    print("Created testingData in "+str(time.time()-sTime))
-#    colNames = None
-#    del colNames
-#    testingDF = None
-#    del testingDF
-    #%% Calculate classProportions.
-    sTime = time.time()
-    classDocCounts = [len(docIDs) for classID, (docIDs, dataMat) in allClassExamples.items()]
-    tempSum = sum(classDocCounts)
-    classProportions = [classCount/tempSum for classCount in classDocCounts]
-    print("Calculated classProportions in "+str(time.time()-sTime))
-#    tempSum = None
-#    del tempSum
-    #%% Calculate wordCountsInClasses.
-    sTime = time.time()
-    wordCountsInClasses = [sp.transpose(dataMat).dot(np.ones(len(docIDs), dtype=np.int32))
-        for classID, (docIDs, dataMat) in allClassExamples.items()]
-    print("Calculated wordCountsInClasses in "+str(time.time()-sTime))
-    #%% Calculate totalWordsInClasses.
-    sTime = time.time()
-    totalWordsInClasses = [sum(classWordCounts) for classWordCounts in wordCountsInClasses]
-    print("Calculated totalWordsInClasses in "+str(time.time()-sTime))
+    reportRunTime("Created testingData")
+    colNames = None
+    del colNames
+    testingDF = None
+    del testingDF
     #%% Dump variables.
-    sTime = time.time()
     with open(pklFileName, 'wb') as pklFile:
         pickle.dump((allClasses,
                      allWords,
                      allClassExamples,
-                     testingData,
-                     classDocCounts,
-                     classProportions,
-                     wordCountsInClasses,
-                     totalWordsInClasses), pklFile)
+                     testingData), pklFile)
         pklFile.close()
-        print("Dumped variables in "+str(time.time()-sTime))
+        reportRunTime("Dumped variables")
+#%% Define data splitting functions.
+def getSubset(examples, rows):
+    docIDs, dataMat = examples
+    return [docIDs[row] for row in rows], dataMat[rows,:]
 
+def splitExamples(examples, splitPorportion = 0.5):
+    docIDs, dataMat = examples
+    assert (len(docIDs) > 1), "Cannot split only one example."
+    rows = list(range(len(docIDs)))
+    random.shuffle(rows)
+    splitIndex = round(splitPorportion*len(docIDs))
+    if splitIndex >= len(rows)-1: splitIndex -= 1
+    return getSubset(examples, rows[:splitIndex]), getSubset(examples, rows[splitIndex:])
+
+def splitClassExamples(classExamples, splitPorportion = 0.5):
+    subSet1 = {}
+    subSet2 = {}
+    for classID, examples in classExamples.items():
+        subSet1[classID], subSet2[classID] = splitExamples(examples, splitPorportion)
+    return subSet1, subSet2
+#%% Seportate allClassExamples into training and validation sets.
+trainingClassExamples, validationClassExamples = splitClassExamples(allClassExamples, 0.75)
+reportRunTime("Split allClassExamples into trainingClassExamples and validationClassExamples")
+#%% Calculate classProportions.
+classDocCounts = [len(docIDs) for classID, (docIDs, dataMat) in trainingClassExamples.items()]
+temp = sum(classDocCounts)
+classProportions = [classCount/temp for classCount in classDocCounts]
+reportRunTime("Calculated classProportions")
+#%% Calculate wordCountsInClasses.
+wordCountsInClasses = [sp.transpose(dataMat).dot(np.ones(len(docIDs), dtype=np.int32))
+    for classID, (docIDs, dataMat) in trainingClassExamples.items()]
+reportRunTime("Calculated wordCountsInClasses")
+#%% Calculate totalWordsInClasses.
+totalWordsInClasses = [sum(classWordCounts) for classWordCounts in wordCountsInClasses]
+reportRunTime("Calculated totalWordsInClasses")
 #%% Naive Bayes Learning
-sTime = time.time()
 #for beta in np.linspace(0,1,1000):
 beta = .01 # This is the best preforming beta value Trevor found.
 alpha = 1 + beta
 temp = (alpha-1)*len(allWords)
 mapMmatrix = np.array([(wordCountsInClasses[classID-1]+(alpha-1))/(totalWordsInClasses[classID-1]+temp)
               for classID in allClasses.keys()])
-print("Calculated mapMmatrix in "+str(time.time()-sTime))
-
 mapMmatrixLog = np.vectorize(math.log2)(mapMmatrix)
-
+reportRunTime("Calculated mapMmatrix")
+def naiveBayesClassify(dataMat):
+    likelyhoods = dataMat.dot(mapMmatrixLog.transpose())
+    b = np.repeat(np.array([list(allClasses.keys())]), len(likelyhoods), axis=0)
+    return b[np.arange(len(likelyhoods)), np.argmax(likelyhoods, axis=1)]
+#%% Naive Bayes Validation
+confusionMatrix = np.zeros((len(allClasses),len(allClasses)), dtype=np.int32)
+for trueClassID, (docIDs, dataMat) in validationClassExamples.items():
+    predictions = naiveBayesClassify(dataMat)
+    classConfusion = np.unique(predictions, return_counts=True)
+    for predictedClassID, count in zip(list(classConfusion[0]), list(classConfusion[1])):
+        confusionMatrix[trueClassID-1][predictedClassID-1] = count
+reportRunTime("Calculated predictions for validationClassExamples set")
 #%% Naive Bayes Testing
-sTime = time.time()
-likelyhoods = testingData[1].dot(mapMmatrixLog.transpose())
-b = np.repeat(np.array([list(allClasses.keys())]), len(likelyhoods), axis=0)
-mostLikely = b[np.arange(len(likelyhoods)), np.argmax(likelyhoods, axis=1)]
-print("Calculated mostLikely in "+str(time.time()-sTime))
-
+predictions = naiveBayesClassify(testingData[1])
+reportRunTime("Calculated predictions for testingData")
 #%% Naive Bayes Testing Submission File
-sTime = time.time()
 answersDF = pd.DataFrame()
 answersDF['id'] = pd.Series(testingData[0])
-answersDF['class'] = pd.Series(mostLikely)
+answersDF['class'] = pd.Series(predictions)
 answersDF.to_csv(nowStr()+'answers.csv', index=False)
-print("Wrote submission file in "+str(time.time()-sTime))
+reportRunTime("Wrote submission file")
+#%% Clean up
+temp = None
+del temp
