@@ -140,7 +140,7 @@ temp = (alpha-1)*len(allWords)
 mapMmatrix = np.array([(wordCountsInClasses[classID-1]+(alpha-1))/(totalWordsInClasses[classID-1]+temp)
               for classID in allClasses.keys()])
 mapMmatrixLog = np.vectorize(math.log2)(mapMmatrix)
-reportRunTime("Calculated mapMmatrix")
+reportRunTime("Calculated mapMmatrix and mapMmatrixLog")
 def naiveBayesClassify(dataMat):
     likelyhoods = dataMat.dot(mapMmatrixLog.transpose())
     b = np.repeat(np.array([list(allClasses.keys())]), len(likelyhoods), axis=0)
@@ -162,6 +162,3 @@ answersDF['id'] = pd.Series(testingData[0])
 answersDF['class'] = pd.Series(predictions)
 answersDF.to_csv(nowStr()+'answers.csv', index=False)
 reportRunTime("Wrote submission file")
-#%% Clean up
-temp = None
-del temp
