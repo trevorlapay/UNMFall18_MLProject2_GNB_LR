@@ -3,9 +3,11 @@ import pickle
 import time
 import scipy as sp
 import numpy as np
+import matplotlib.pyplot as plt
 import pandas as pd
 import random
 import math
+
 
 pklFileName = "ConstructionZone2Vars.pkl"
 
@@ -153,6 +155,31 @@ for trueClassID, (docIDs, dataMat) in validationClassExamples.items():
     for predictedClassID, count in zip(list(classConfusion[0]), list(classConfusion[1])):
         confusionMatrix[trueClassID-1][predictedClassID-1] = count
 reportRunTime("Calculated predictions for validationClassExamples set")
+#%% Plot confusion matrix
+noDiagConMat = confusionMatrix.copy()
+for i in range(len(noDiagConMat)):
+    noDiagConMat[i, i] = 0
+noDiagConMat *= -1
+fig, conMatAx = plt.subplots(figsize=(8, 8))
+conMatIm = conMatAx.matshow(noDiagConMat,cmap=plt.get_cmap("Reds").reversed())
+conMatAx.set_xticks(np.arange(len(allClasses)))
+conMatAx.set_yticks(np.arange(len(allClasses)))
+conMatAx.set_xticklabels(allClasses.keys())
+conMatAx.set_yticklabels(allClasses.keys())
+conMatAx.tick_params(top=False, bottom=True, labeltop=False, labelbottom=True)
+plt.setp(conMatAx.get_xticklabels(), rotation=90, ha="right", rotation_mode="anchor")
+textcolors=["black", "white"]
+for i in range(len(allClasses)):
+    for j in range(len(allClasses)):
+        if confusionMatrix[i, j] != 0:
+            if i == j: color = textcolors[0]
+            else: color=textcolors[conMatIm.norm(noDiagConMat[i,j])<conMatIm.norm(noDiagConMat.max())/3]
+            text = conMatAx.text(j, i, confusionMatrix[i, j],
+                           ha="center", va="center", size=10, color=color)
+conMatAx.set_title("Confusion Matrix")
+fig.tight_layout()
+plt.show()
+reportRunTime("Plotted confusionMatrix")
 #%% Naive Bayes Testing
 predictions = naiveBayesClassify(testingData[1])
 reportRunTime("Calculated predictions for testingData")
