@@ -171,6 +171,8 @@ conMatAx.set_xticks(np.arange(len(allClasses)))
 conMatAx.set_yticks(np.arange(len(allClasses)))
 conMatAx.set_xticklabels(allClasses.values())
 conMatAx.set_yticklabels(allClasses.values())
+conMatAx.set_xlabel("Predicted Classes", size=14)
+conMatAx.set_ylabel("True Classes", size=14)
 conMatAx.tick_params(top=False, bottom=True, labeltop=False, labelbottom=True)
 plt.setp(conMatAx.get_xticklabels(), rotation=60, ha="right", rotation_mode="anchor")
 textcolors=["black", "white"]
@@ -181,7 +183,7 @@ for i in range(len(allClasses)):
             else: color=textcolors[conMatIm.norm(noDiagConMat[i,j])<conMatIm.norm(noDiagConMat.max())/3]
             text = conMatAx.text(j, i, metaConfusionMatrix[i, j],
                            ha="center", va="center", size=10, color=color)
-conMatAx.set_title("Average Confusion Matrix of "+str(numValidations)+"Naive Bayes Validation Rounds",size=20)
+conMatAx.set_title("Average Confusion Matrix of "+str(numValidations)+" Naive Bayes Validation Rounds",size=16)
 fig.tight_layout()
 fig.savefig(nowStr()+'metaConfusionMatrix.png')
 plt.show()
