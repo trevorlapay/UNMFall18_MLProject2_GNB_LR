@@ -119,67 +119,73 @@ def splitClassExamples(classExamples, splitPorportion = 0.5):
     for classID, examples in classExamples.items():
         subSet1[classID], subSet2[classID] = splitExamples(examples, splitPorportion)
     return subSet1, subSet2
-#%% Seportate allClassExamples into training and validation sets.
-trainingClassExamples, validationClassExamples = splitClassExamples(allClassExamples, 0.75)
-reportRunTime("Split allClassExamples into trainingClassExamples and validationClassExamples")
-#%% Calculate classProportions.
-classDocCounts = [len(docIDs) for classID, (docIDs, dataMat) in trainingClassExamples.items()]
-temp = sum(classDocCounts)
-classProportions = [classCount/temp for classCount in classDocCounts]
-reportRunTime("Calculated classProportions")
-#%% Calculate wordCountsInClasses.
-wordCountsInClasses = [sp.transpose(dataMat).dot(np.ones(len(docIDs), dtype=np.int32))
-    for classID, (docIDs, dataMat) in trainingClassExamples.items()]
-reportRunTime("Calculated wordCountsInClasses")
-#%% Calculate totalWordsInClasses.
-totalWordsInClasses = [sum(classWordCounts) for classWordCounts in wordCountsInClasses]
-reportRunTime("Calculated totalWordsInClasses")
-#%% Naive Bayes Learning
-#for beta in np.linspace(0,1,1000):
-beta = .01 # This is the best preforming beta value Trevor found.
-alpha = 1 + beta
-temp = (alpha-1)*len(allWords)
-mapMmatrix = np.array([(wordCountsInClasses[classID-1]+(alpha-1))/(totalWordsInClasses[classID-1]+temp)
-              for classID in allClasses.keys()])
-mapMmatrixLog = np.vectorize(math.log2)(mapMmatrix)
-reportRunTime("Calculated mapMmatrix and mapMmatrixLog")
-def naiveBayesClassify(dataMat):
-    likelyhoods = dataMat.dot(mapMmatrixLog.transpose())
-    b = np.repeat(np.array([list(allClasses.keys())]), len(likelyhoods), axis=0)
-    return b[np.arange(len(likelyhoods)), np.argmax(likelyhoods, axis=1)]
-#%% Naive Bayes Validation
-confusionMatrix = np.zeros((len(allClasses),len(allClasses)), dtype=np.int32)
-for trueClassID, (docIDs, dataMat) in validationClassExamples.items():
-    predictions = naiveBayesClassify(dataMat)
-    classConfusion = np.unique(predictions, return_counts=True)
-    for predictedClassID, count in zip(list(classConfusion[0]), list(classConfusion[1])):
-        confusionMatrix[trueClassID-1][predictedClassID-1] = count
-reportRunTime("Calculated predictions for validationClassExamples set")
+metaConfusionMatrix = np.zeros((len(allClasses),len(allClasses)), dtype=np.int32)
+numValidations = 20
+for i in range(numValidations):
+    #%% Seportate allClassExamples into training and validation sets.
+    trainingClassExamples, validationClassExamples = splitClassExamples(allClassExamples, 0.75)
+#    reportRunTime("Split allClassExamples into trainingClassExamples and validationClassExamples")
+    #%% Calculate classProportions.
+    classDocCounts = [len(docIDs) for classID, (docIDs, dataMat) in trainingClassExamples.items()]
+    temp = sum(classDocCounts)
+    classProportions = [classCount/temp for classCount in classDocCounts]
+#    reportRunTime("Calculated classProportions")
+    #%% Calculate wordCountsInClasses.
+    wordCountsInClasses = [sp.transpose(dataMat).dot(np.ones(len(docIDs), dtype=np.int32))
+        for classID, (docIDs, dataMat) in trainingClassExamples.items()]
+#    reportRunTime("Calculated wordCountsInClasses")
+    #%% Calculate totalWordsInClasses.
+    totalWordsInClasses = [sum(classWordCounts) for classWordCounts in wordCountsInClasses]
+#    reportRunTime("Calculated totalWordsInClasses")
+    #%% Naive Bayes Learning
+    #for beta in np.linspace(0,1,1000):
+    beta = .01 # This is the best preforming beta value Trevor found.
+    alpha = 1 + beta
+    temp = (alpha-1)*len(allWords)
+    mapMmatrix = np.array([(wordCountsInClasses[classID-1]+(alpha-1))/(totalWordsInClasses[classID-1]+temp)
+                  for classID in allClasses.keys()])
+    mapMmatrixLog = np.vectorize(math.log2)(mapMmatrix)
+#    reportRunTime("Calculated mapMmatrix and mapMmatrixLog")
+    def naiveBayesClassify(dataMat):
+        likelyhoods = dataMat.dot(mapMmatrixLog.transpose())
+        b = np.repeat(np.array([list(allClasses.keys())]), len(likelyhoods), axis=0)
+        return b[np.arange(len(likelyhoods)), np.argmax(likelyhoods, axis=1)]
+    #%% Naive Bayes Validation
+    confusionMatrix = np.zeros((len(allClasses),len(allClasses)), dtype=np.int32)
+    for trueClassID, (docIDs, dataMat) in validationClassExamples.items():
+        predictions = naiveBayesClassify(dataMat)
+        classConfusion = np.unique(predictions, return_counts=True)
+        for predictedClassID, count in zip(list(classConfusion[0]), list(classConfusion[1])):
+            confusionMatrix[trueClassID-1][predictedClassID-1] = count
+#    reportRunTime("Calculated predictions for validationClassExamples set")
+    metaConfusionMatrix += confusionMatrix
 #%% Plot confusion matrix
-noDiagConMat = confusionMatrix.copy()
+metaConfusionMatrix = (np.vectorize(round)(metaConfusionMatrix / numValidations)).astype(np.int32)
+noDiagConMat = metaConfusionMatrix.copy()
 for i in range(len(noDiagConMat)):
     noDiagConMat[i, i] = 0
 noDiagConMat *= -1
-fig, conMatAx = plt.subplots(figsize=(8, 8))
+fig, conMatAx = plt.subplots(figsize=(10, 10))
 conMatIm = conMatAx.matshow(noDiagConMat,cmap=plt.get_cmap("Reds").reversed())
 conMatAx.set_xticks(np.arange(len(allClasses)))
 conMatAx.set_yticks(np.arange(len(allClasses)))
-conMatAx.set_xticklabels(allClasses.keys())
-conMatAx.set_yticklabels(allClasses.keys())
+conMatAx.set_xticklabels(allClasses.values())
+conMatAx.set_yticklabels(allClasses.values())
 conMatAx.tick_params(top=False, bottom=True, labeltop=False, labelbottom=True)
-plt.setp(conMatAx.get_xticklabels(), rotation=90, ha="right", rotation_mode="anchor")
+plt.setp(conMatAx.get_xticklabels(), rotation=60, ha="right", rotation_mode="anchor")
 textcolors=["black", "white"]
 for i in range(len(allClasses)):
     for j in range(len(allClasses)):
-        if confusionMatrix[i, j] != 0:
+        if metaConfusionMatrix[i, j] != 0:
             if i == j: color = textcolors[0]
             else: color=textcolors[conMatIm.norm(noDiagConMat[i,j])<conMatIm.norm(noDiagConMat.max())/3]
-            text = conMatAx.text(j, i, confusionMatrix[i, j],
+            text = conMatAx.text(j, i, metaConfusionMatrix[i, j],
                            ha="center", va="center", size=10, color=color)
-conMatAx.set_title("Confusion Matrix")
+conMatAx.set_title("Average Confusion Matrix of "+str(numValidations)+"Naive Bayes Validation Rounds",size=20)
 fig.tight_layout()
+fig.savefig(nowStr()+'metaConfusionMatrix.png')
 plt.show()
-reportRunTime("Plotted confusionMatrix")
+reportRunTime("Plotted metaConfusionMatrix")
 #%% Naive Bayes Testing
 predictions = naiveBayesClassify(testingData[1])
 reportRunTime("Calculated predictions for testingData")
