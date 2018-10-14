@@ -176,7 +176,7 @@ def plotConfusionMat(confMat, title="Confusion Matrix"):
     confMatFig.savefig(nowStr()+'confusionMatrix.png')
     plt.show()
 #%% Define Naive Bayes functions
-def naiveBayesTrain(classExamples, beta=0.019, asLog=True):
+def naiveBayesTrain(classExamples, beta=0.035, asLog=True):
     classDocCounts = [len(docIDs) for classID, (docIDs, dataMat) in classExamples.items()]
     temp = sum(classDocCounts)
     priors = np.array([classCount/temp for classCount in classDocCounts])
@@ -215,40 +215,67 @@ plotConfusionMat(avgConfusionMat,
 #%% Test Naive Bayes
 testClassifier(TEST_EXAMPLES, naiveBayesClassify, mapMat=mapMat, priors=priors)
 reportRunTime("Naive Bayes training, validating and testing")
-#%% Define beta error rate calculator function
+#%% Define beta error rate functions
 def getBetaErrorRates(numBetas=100, numDataSplits=10, start=-5, stop=0):
     betaAndErRts = {beta : 0 for beta in np.logspace(start, stop, numBetas)}
-    for i in range(numDataSplits):
+    oldBestBeta = 1
+    for i in range(1, numDataSplits + 1):
         trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES,0.75)
         for beta, avgErrorRate in betaAndErRts.items():
             mapMat, priors = naiveBayesTrain(trainingData, beta)
             errorRate = validateClassifier(validationData, False, naiveBayesClassify, 
                                            mapMat=mapMat, priors=priors)
-            betaAndErRts[beta] = avgErrorRate + errorRate
+            betaAndErRts[beta] = ((i - 1) * avgErrorRate + errorRate) / i
         reportRunTime("Got {} beta error rates for split {}/{}".format(numBetas, i, numDataSplits))
-    return {beta : avgErrorRate/numDataSplits for beta, avgErrorRate in betaAndErRts.items()}
+        fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,i)
+        with open(fileName, 'wb') as betaAndErRtsPklFile:
+            pickle.dump(betaAndErRts, betaAndErRtsPklFile)
+            betaAndErRtsPklFile.close()
+        bestBeta,lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt: betaAndErRt[1])
+        if oldBestBeta != bestBeta:
+            print("bestBeta changed from {} to {}".format(oldBestBeta, bestBeta))
+            oldBestBeta = bestBeta
+        else:
+            print("bestBeta stayed "+str(oldBestBeta))
+    return betaAndErRts
+def plotErrorRatesAccrossBetas(betaAndErRts, fileName="BetaErrorRates"):
+    betaErRtFig, betaErRtAx = plt.subplots(figsize=(10, 10))
+    betaErRtIm = betaErRtAx.plot(*zip(*(betaAndErRts.items())))
+    betaErRtAx.set_xscale('log')
+    betaErRtAx.set_xlabel("Beta")
+    betaErRtAx.set_ylabel("Average Error Rate")
+    betaErRtAx.set_title("Error Rates Across Beta Values", size=14)
+    bestBeta, lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt : betaAndErRt[1])
+    text = "beta={:.4f}, error rate={:.4f}".format(bestBeta, lowestErrorRate)
+    bboxProps = dict(boxstyle="square,pad=0.2", fc="w", lw=0.5)
+    arrowProps = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=60")
+    betaErRtAx.annotate(text, xy=(bestBeta, lowestErrorRate), xytext=(0.6,0.025), xycoords='data',
+                        textcoords="axes fraction", arrowprops=arrowProps, bbox=bboxProps, ha="right",
+                        va="top")
+    betaErRtFig.tight_layout()
+    betaErRtFig.savefig(nowStr()+fileName+".png")
+    betaErRtFig.tight_layout()
+    plt.show()
 #%% Find best beta
-if True:
-    betaAndErRts = getBetaErrorRates(2000, 20)
-    with open(nowStr()+"ErrorRatesAcrossBetas.pkl", 'wb') as betaAndErRtsPklFile:
-        pickle.dump(betaAndErRts, betaAndErRtsPklFile)
-        betaAndErRtsPklFile.close()
-else:
-    with open("2018-10-14_03-54-34ErrorRatesAcrossBetas.pkl", 'rb') as betaAndErRtsPklFile:
-        betaAndErRts = pickle.load(betaAndErRtsPklFile)
-        betaAndErRtsPklFile.close()
-bestBeta, lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt : betaAndErRt[1])
-#%% Plot betas
-betaErRtFig, betaErRtAx = plt.subplots(figsize=(10, 10))
-betaErRtIm = betaErRtAx.plot(*zip(*(betaAndErRts.items())))
-betaErRtAx.set_xscale('log')
-betaErRtAx.set_xlabel("Beta")
-betaErRtAx.set_ylabel("Average Error Rate")
-betaErRtAx.set_title("Error Rates Across Beta Values", size=14)
-betaErRtFig.tight_layout()
-betaErRtFig.savefig(nowStr()+'BetaErrorRates.png')
-betaErRtFig.tight_layout()
-plt.show()
+numBetas = 4000
+numDataSplits = 20
+try:
+    for i in range(1, numDataSplits + 1):
+        fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,i)
+        with open(fileName, 'rb') as betaAndErRtsPklFile:
+            betaAndErRts = pickle.load(betaAndErRtsPklFile)
+            betaAndErRtsPklFile.close()
+        plotErrorRatesAccrossBetas(betaAndErRts, "BetaErrorRatesAvgOver{}splits".format(i))
+except:
+    try:
+        fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,numDataSplits)
+        with open(fileName, 'rb') as betaAndErRtsPklFile:
+            betaAndErRts = pickle.load(betaAndErRtsPklFile)
+            betaAndErRtsPklFile.close()
+        plotErrorRatesAccrossBetas(betaAndErRts)
+    except:
+        betaAndErRts = getBetaErrorRates(numBetas, numDataSplits)
+        plotErrorRatesAccrossBetas(betaAndErRts)
 #%% Logistic Regression
 def mashEverythingBackTogether(classExamples):
     deltaMat = sp.sparse.block_diag([np.array([1]*len(docIDs), dtype=np.int8)
