@@ -19,9 +19,6 @@ def reportRunTime(taskStr):
 def nowStr(): return time.strftime("%Y-%m-%d_%H-%M-%S")
 #%% Load basic data (previously read, derived and saved).
 try:
-    # True  -> start from scratch
-    # False -> load from file
-    if False: raise Exception()
     with open(PKL_FILE_NAME, 'rb') as pklFile:
         (ALL_CLASSES,
          ALL_WORDS,
@@ -67,6 +64,11 @@ except Exception as err:
         print("Could not read training data from training.csv.")
         raise
     #%% Create ALL_CLASS_EXAMPLES.
+    # ALL_CLASS_EXAMPLES is a dictionary with class IDs as keys and tuples as values. The first item
+    # of the tuple is the list of Document IDs matching the class in the key. The second item of the
+    # tuple is a matrix where every row corresponds to a document in the list of document IDs and 
+    # every column corresponds to a word in the vocabulary. Every cell in this matrix is the count 
+    # of the column's word in the row's document.
     ALL_CLASS_EXAMPLES = {classID : (list(examples['docID']),
                                      sp.sparse.csr_matrix(examples[list(ALL_WORDS.keys())]))
                           for classID, examples in trainingDF.groupby('classID')}
@@ -84,6 +86,7 @@ except Exception as err:
         print("Could not read testing data from testing.csv.")
         raise
     #%% Create TEST_EXAMPLES
+    # TEST_EXAMPLES is structured like one of the tuples in the ALL_CLASS_EXAMPLES dictionary.
     TEST_EXAMPLES = (testingDF['docID'].tolist(), sp.sparse.csr_matrix(testingDF[colNames[1:-1]]))
     reportRunTime("Created TEST_EXAMPLES")
     colNames = None
@@ -173,11 +176,10 @@ def plotConfusionMat(confMat, title="Confusion Matrix"):
     confMatFig.savefig(nowStr()+'confusionMatrix.png')
     plt.show()
 #%% Define Naive Bayes functions
-def naiveBayesTrain(classExamples, beta=0.019, mapMatAsLog=True):
-#    #%% Calculate classProportions.
-#    classDocCounts = [len(docIDs) for classID, (docIDs, dataMat) in classExamples.items()]
-#    temp = sum(classDocCounts)
-#    classProportions = [classCount/temp for classCount in classDocCounts]
+def naiveBayesTrain(classExamples, beta=0.019, asLog=True):
+    classDocCounts = [len(docIDs) for classID, (docIDs, dataMat) in classExamples.items()]
+    temp = sum(classDocCounts)
+    priors = np.array([classCount/temp for classCount in classDocCounts])
     wordCountsInClasses = [sp.transpose(dataMat).dot(np.ones(len(docIDs), dtype=np.int32))
                            for classID, (docIDs, dataMat) in classExamples.items()]
     totalWordsInClasses = [sum(classWordCounts) for classWordCounts in wordCountsInClasses]
@@ -185,9 +187,12 @@ def naiveBayesTrain(classExamples, beta=0.019, mapMatAsLog=True):
     mapMat = np.array([(wordCountsInClasses[classID-1]+(beta))
                        /(totalWordsInClasses[classID-1]+temp)
                        for classID in ALL_CLASSES.keys()])
-    return np.vectorize(math.log2)(mapMat) if mapMatAsLog else mapMat
-def naiveBayesClassify(dataMat, mapMat):
-    likelyhoods = dataMat.dot(mapMat.transpose())
+    if asLog:
+        return np.vectorize(math.log2)(mapMat), np.vectorize(math.log2)(priors)
+    else:
+        return mapMat, priors
+def naiveBayesClassify(dataMat, mapMat, priors):
+    likelyhoods = dataMat.dot(mapMat.transpose()) + priors
     b = np.repeat(np.array([list(ALL_CLASSES.keys())]), len(likelyhoods), axis=0)
     return b[np.arange(len(likelyhoods)), np.argmax(likelyhoods, axis=1)]
 #%% Train and validate Naive Bayes with random subsets
@@ -196,9 +201,9 @@ avgConfusionMat = np.zeros((len(ALL_CLASSES),len(ALL_CLASSES)), dtype=np.int32)
 numDataSplits = 20
 for i in range(numDataSplits):
     trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES, 0.75)
-    mapMat = naiveBayesTrain(trainingData)
+    mapMat, priors = naiveBayesTrain(trainingData)
     errorRate, confusionMat = validateClassifier(validationData, True, naiveBayesClassify,
-                                                 mapMat=mapMat)
+                                                 mapMat=mapMat, priors=priors)
     avgErrorRate += errorRate
     avgConfusionMat += confusionMat
 avgErrorRate = round(avgErrorRate/numDataSplits, 4)
@@ -208,7 +213,7 @@ plotConfusionMat(avgConfusionMat,
                  "Average Confusion Matrix of "+str(numDataSplits)+" Naive Bayes Rounds"
                  +"\nAverage Error Rate = "+str(avgErrorRate))
 #%% Test Naive Bayes
-testClassifier(TEST_EXAMPLES, naiveBayesClassify, mapMat=mapMat)
+testClassifier(TEST_EXAMPLES, naiveBayesClassify, mapMat=mapMat, priors=priors)
 reportRunTime("Naive Bayes training, validating and testing")
 #%% Define beta error rate calculator function
 def getBetaErrorRates(numBetas=100, numDataSplits=10, start=-5, stop=0):
@@ -216,9 +221,9 @@ def getBetaErrorRates(numBetas=100, numDataSplits=10, start=-5, stop=0):
     for i in range(numDataSplits):
         trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES,0.75)
         for beta, avgErrorRate in betaAndErRts.items():
-            mapMat = naiveBayesTrain(trainingData, beta)
+            mapMat, priors = naiveBayesTrain(trainingData, beta)
             errorRate = validateClassifier(validationData, False, naiveBayesClassify, 
-                                           mapMat=mapMat)
+                                           mapMat=mapMat, priors=priors)
             betaAndErRts[beta] = avgErrorRate + errorRate
         reportRunTime("Got {} beta error rates for split {}/{}".format(numBetas, i, numDataSplits))
     return {beta : avgErrorRate/numDataSplits for beta, avgErrorRate in betaAndErRts.items()}
