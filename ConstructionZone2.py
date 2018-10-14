@@ -10,14 +10,14 @@ import math
 
 PKL_FILE_NAME = "ConstructionZone2Vars.pkl"
 
-#%% Define time related itmes
+#%% Define time related items
 sTime = time.time()
 def reportRunTime(taskStr):
     global sTime
     print(taskStr + " in "+str(time.time()-sTime))
     sTime = time.time()
 def nowStr(): return time.strftime("%Y-%m-%d_%H-%M-%S")
-#%% Load basic data (previously read, dirived and saved).
+#%% Load basic data (previously read, derived and saved).
 try:
     # True  -> start from scratch
     # False -> load from file
@@ -68,8 +68,8 @@ except Exception as err:
         raise
     #%% Create ALL_CLASS_EXAMPLES.
     ALL_CLASS_EXAMPLES = {classID : (list(examples['docID']),
-                                sp.sparse.csr_matrix(examples[list(ALL_WORDS.keys())]))
-        for classID, examples in trainingDF.groupby('classID')}
+                                     sp.sparse.csr_matrix(examples[list(ALL_WORDS.keys())]))
+                          for classID, examples in trainingDF.groupby('classID')}
     reportRunTime("Created ALL_CLASS_EXAMPLES")
     trainingDF = None
     del trainingDF
@@ -103,20 +103,20 @@ def getSubset(examples, rows):
     docIDs, dataMat = examples
     return [docIDs[row] for row in rows], dataMat[rows,:]
 
-def splitExamples(examples, splitPorportion = 0.5):
+def splitExamples(examples, splitProportion = 0.5):
     docIDs, dataMat = examples
     assert (len(docIDs) > 1), "Cannot split only one example."
     rows = list(range(len(docIDs)))
     random.shuffle(rows)
-    splitIndex = round(splitPorportion*len(docIDs))
+    splitIndex = round(splitProportion*len(docIDs))
     if splitIndex >= len(rows)-1: splitIndex -= 1
     return getSubset(examples, rows[:splitIndex]), getSubset(examples, rows[splitIndex:])
 
-def splitClassExamples(classExamples, splitPorportion = 0.5):
+def splitClassExamples(classExamples, splitProportion = 0.5):
     subSet1 = {}
     subSet2 = {}
     for classID, examples in classExamples.items():
-        subSet1[classID], subSet2[classID] = splitExamples(examples, splitPorportion)
+        subSet1[classID], subSet2[classID] = splitExamples(examples, splitProportion)
     return subSet1, subSet2
 #%% Define general validation and testing functions
 def validateClassifier(classExamples, returnConfMat, classifyFunc, **kwargs):
@@ -134,7 +134,7 @@ def validateClassifier(classExamples, returnConfMat, classifyFunc, **kwargs):
             if predictedClassID != trueClassID:
                 errorCount += count
     errorRate = errorCount/exampleCount
-    if returnConfMat: return errorRate, confusionMat 
+    if returnConfMat: return errorRate, confusionMat
     else: return errorRate
 def testClassifier(examples, classifyFunc, **kwargs):
     predictions = classifyFunc(examples[1], **kwargs)
@@ -167,7 +167,7 @@ def plotConfusionMat(confMat, title="Confusion Matrix"):
                     color = textcolors[1]
                 else:
                     color = textcolors[0]
-                confMatAx.text(j, i, confMat[i, j], ha="center", va="center", size=10, color=color)
+                confMatAx.text(j, i, confMat[i,j], ha="center", va="center", size=10, color=color)
     confMatAx.set_title(title, size=16)
     confMatFig.tight_layout()
     confMatFig.savefig(nowStr()+'confusionMatrix.png')
@@ -179,18 +179,18 @@ def naiveBayesTrain(classExamples, beta=0.019, mapMatAsLog=True):
 #    temp = sum(classDocCounts)
 #    classProportions = [classCount/temp for classCount in classDocCounts]
     wordCountsInClasses = [sp.transpose(dataMat).dot(np.ones(len(docIDs), dtype=np.int32))
-        for classID, (docIDs, dataMat) in classExamples.items()]
+                           for classID, (docIDs, dataMat) in classExamples.items()]
     totalWordsInClasses = [sum(classWordCounts) for classWordCounts in wordCountsInClasses]
     temp = (beta)*len(ALL_WORDS)
     mapMat = np.array([(wordCountsInClasses[classID-1]+(beta))
                        /(totalWordsInClasses[classID-1]+temp)
-                  for classID in ALL_CLASSES.keys()])
+                       for classID in ALL_CLASSES.keys()])
     return np.vectorize(math.log2)(mapMat) if mapMatAsLog else mapMat
 def naiveBayesClassify(dataMat, mapMat):
     likelyhoods = dataMat.dot(mapMat.transpose())
     b = np.repeat(np.array([list(ALL_CLASSES.keys())]), len(likelyhoods), axis=0)
     return b[np.arange(len(likelyhoods)), np.argmax(likelyhoods, axis=1)]
-#%% Train and validate Naive Bayes with different random selections of tarining and validation sets
+#%% Train and validate Naive Bayes with random subsets
 avgErrorRate = 0
 avgConfusionMat = np.zeros((len(ALL_CLASSES),len(ALL_CLASSES)), dtype=np.int32)
 numDataSplits = 20
@@ -217,73 +217,73 @@ def getBetaErrorRates(numBetas=100, numDataSplits=10, start=-5, stop=0):
         trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES,0.75)
         for beta, avgErrorRate in betaAndErRts.items():
             mapMat = naiveBayesTrain(trainingData, beta)
-            errorRate = validateClassifier(validationData, False, naiveBayesClassify, mapMat=mapMat)
+            errorRate = validateClassifier(validationData, False, naiveBayesClassify, 
+                                           mapMat=mapMat)
             betaAndErRts[beta] = avgErrorRate + errorRate
+        reportRunTime("Got {} beta error rates for split {}/{}".format(numBetas, i, numDataSplits))
     return {beta : avgErrorRate/numDataSplits for beta, avgErrorRate in betaAndErRts.items()}
-    #%% Find best beta
-if False:
+#%% Find best beta
+if True:
     betaAndErRts = getBetaErrorRates(2000, 20)
     with open(nowStr()+"ErrorRatesAcrossBetas.pkl", 'wb') as betaAndErRtsPklFile:
         pickle.dump(betaAndErRts, betaAndErRtsPklFile)
         betaAndErRtsPklFile.close()
-    bestBeta, lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt : betaAndErRt[1])
-    #%% Plot betas
-    betaErRtFig, betaErRtAx = plt.subplots(figsize=(10, 10))
-    betaErRtIm = betaErRtAx.plot(*zip(*(betaAndErRts.items())))
-    betaErRtAx.set_xscale('log')
-    betaErRtAx.set_xlabel("Beta")
-    betaErRtAx.set_ylabel("Average Error Rate")
-    betaErRtAx.set_title("Error Rates Across Beta Values", size=14)
-    betaErRtFig.tight_layout()
-    betaErRtFig.savefig(nowStr()+'BetaErrorRates.png')
-    betaErRtFig.tight_layout()
-    plt.show()
+else:
+    with open("2018-10-14_03-54-34ErrorRatesAcrossBetas.pkl", 'rb') as betaAndErRtsPklFile:
+        betaAndErRts = pickle.load(betaAndErRtsPklFile)
+        betaAndErRtsPklFile.close()
+bestBeta, lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt : betaAndErRt[1])
+#%% Plot betas
+betaErRtFig, betaErRtAx = plt.subplots(figsize=(10, 10))
+betaErRtIm = betaErRtAx.plot(*zip(*(betaAndErRts.items())))
+betaErRtAx.set_xscale('log')
+betaErRtAx.set_xlabel("Beta")
+betaErRtAx.set_ylabel("Average Error Rate")
+betaErRtAx.set_title("Error Rates Across Beta Values", size=14)
+betaErRtFig.tight_layout()
+betaErRtFig.savefig(nowStr()+'BetaErrorRates.png')
+betaErRtFig.tight_layout()
+plt.show()
 #%% Logistic Regression
 def mashEverythingBackTogether(classExamples):
     deltaMat = sp.sparse.block_diag([np.array([1]*len(docIDs), dtype=np.int8)
                                      for docIDs, dataMat in classExamples.values()])
     wholeDataMat = sp.sparse.vstack([dataMat for docIDs, dataMat in classExamples.values()])
     return wholeDataMat, deltaMat
-
-examplesWithImaginedWord = {classId : (docID, 
-                                       sp.sparse.hstack([sp.ones((dataMat.shape[0],1)), dataMat], 
-                                                         'csr', np.int32))
+examplesWithImaginedWord = {classId : (docID,
+                                       sp.sparse.hstack([sp.ones((dataMat.shape[0],1)), dataMat],
+                                                        'csr', np.int32))
                             for classId, (docID, dataMat) in ALL_CLASS_EXAMPLES.items()}
 trainingData, validationData = splitClassExamples(examplesWithImaginedWord, 0.75)
 weightsMat = np.matrix(np.zeros((len(ALL_CLASSES.keys()),len(ALL_WORDS)+1)))
 learningRate = 0.01
 penaltyStrength = 0.01
 mashedTrainingData, deltaMat = mashEverythingBackTogether(trainingData)
-
 normingDenominators = (mashedTrainingData.sum(axis=0)+1)
-
 normedMashedTrainingData = mashedTrainingData / normingDenominators
-
 def probMat(weightsMat, dataMat):
     preNormed = np.exp(weightsMat * dataMat.transpose())
     normed = preNormed / (preNormed.sum(axis=0)+1)
     return normed
-
-for i in range(10):
-    print(weightsMat)
+for i in range(100):
     weightsMat = weightsMat + learningRate * (
-            (deltaMat - probMat(weightsMat, normedMashedTrainingData)) * normedMashedTrainingData 
-            - penaltyStrength * weightsMat)
-    reportRunTime("Weight iteration "+str(i))
+        (deltaMat - probMat(weightsMat, normedMashedTrainingData)) * normedMashedTrainingData
+        - penaltyStrength * weightsMat)
+    if i % 100 == 0:
+        reportRunTime("Iteration "+str(i))
 with open(nowStr()+"LogisticRegressionWeightsAfter"+str(i+1)+".pkl", 'wb') as weightsPklFile:
     pickle.dump(weightsMat, weightsPklFile)
     weightsPklFile.close()
-
-
-def logisticRegressionClassify(dataMat, weightsMat):
+def logisticRegressionClassify(dataMat, normingDenominators, weightsMat):
     if dataMat.shape[1] == len(ALL_WORDS.keys()):
         dataMat = sp.sparse.hstack([sp.ones((dataMat.shape[0],1)), dataMat], 'csr', np.int32)
+    dataMat = dataMat / normingDenominators
     likelyhoods = dataMat.dot(weightsMat.transpose())
     return np.array((np.argmax(likelyhoods, axis=1) + 1).flatten().tolist()[0])
-
-predictions = logisticRegressionClassify(TEST_EXAMPLES[1], weightsMat)
-
+predictions = logisticRegressionClassify(TEST_EXAMPLES[1], normingDenominators, weightsMat)
 errorRate, confMat = validateClassifier(validationData, True, logisticRegressionClassify,
+                                        normingDenominators=normingDenominators,
                                         weightsMat=weightsMat)
 plotConfusionMat(confMat, "Confusion Matrix\nError Rate = "+str(errorRate))
-testClassifier(TEST_EXAMPLES, logisticRegressionClassify, weightsMat=weightsMat)
+testClassifier(TEST_EXAMPLES, logisticRegressionClassify, normingDenominators=normingDenominators,
+               weightsMat=weightsMat)
