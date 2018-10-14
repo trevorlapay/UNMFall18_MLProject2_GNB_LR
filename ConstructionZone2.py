@@ -119,16 +119,25 @@ def splitClassExamples(classExamples, splitPorportion = 0.5):
         subSet1[classID], subSet2[classID] = splitExamples(examples, splitPorportion)
     return subSet1, subSet2
 #%% Define general validation and testing functions
-def validateClassifier(classExamples, classifyFunction, **kwargs):
-    confusionMat = np.zeros((len(ALL_CLASSES),len(ALL_CLASSES)), dtype=np.int32)
+def validateClassifier(classExamples, returnConfMat, classifyFunc, **kwargs):
+    if returnConfMat:
+        confusionMat = np.zeros((len(ALL_CLASSES),len(ALL_CLASSES)), dtype=np.int32)
+    exampleCount = 0
+    errorCount = 0
     for trueClassID, (docIDs, dataMat) in classExamples.items():
-        predictions = classifyFunction(dataMat, **kwargs)
+        predictions = classifyFunc(dataMat, **kwargs)
         classConfusion = np.unique(predictions, return_counts=True)
         for predictedClassID, count in zip(list(classConfusion[0]), list(classConfusion[1])):
-            confusionMat[trueClassID-1][predictedClassID-1] = count
-    return confusionMat
-def testClassifier(examples, classifyFunction, **kwargs):
-    predictions = classifyFunction(examples[1], **kwargs)
+            if returnConfMat:
+                confusionMat[trueClassID-1][predictedClassID-1] = count
+            exampleCount += count
+            if predictedClassID != trueClassID:
+                errorCount += count
+    errorRate = errorCount/exampleCount
+    if returnConfMat: return errorRate, confusionMat 
+    else: return errorRate
+def testClassifier(examples, classifyFunc, **kwargs):
+    predictions = classifyFunc(examples[1], **kwargs)
     answersDF = pd.DataFrame()
     answersDF['id'] = pd.Series(examples[0])
     answersDF['class'] = pd.Series(predictions)
@@ -139,7 +148,7 @@ def plotConfusionMat(confMat, title="Confusion Matrix"):
     for i in range(len(noDiagConfMat)):
         noDiagConfMat[i, i] = 0
     noDiagConfMat *= -1
-    fig, confMatAx = plt.subplots(figsize=(10, 10))
+    confMatFig, confMatAx = plt.subplots(figsize=(10, 10))
     confMatIm = confMatAx.matshow(noDiagConfMat, cmap=plt.get_cmap("Reds").reversed())
     confMatAx.set_xticks(np.arange(len(ALL_CLASSES)))
     confMatAx.set_yticks(np.arange(len(ALL_CLASSES)))
@@ -160,11 +169,11 @@ def plotConfusionMat(confMat, title="Confusion Matrix"):
                     color = textcolors[0]
                 confMatAx.text(j, i, confMat[i, j], ha="center", va="center", size=10, color=color)
     confMatAx.set_title(title, size=16)
-    fig.tight_layout()
-    fig.savefig(nowStr()+'confusionMatrix.png')
+    confMatFig.tight_layout()
+    confMatFig.savefig(nowStr()+'confusionMatrix.png')
     plt.show()
 #%% Define Naive Bayes functions
-def naiveBayesTrain(classExamples, mapMatAsLog=True):
+def naiveBayesTrain(classExamples, beta=0.019, mapMatAsLog=True):
 #    #%% Calculate classProportions.
 #    classDocCounts = [len(docIDs) for classID, (docIDs, dataMat) in classExamples.items()]
 #    temp = sum(classDocCounts)
@@ -172,8 +181,6 @@ def naiveBayesTrain(classExamples, mapMatAsLog=True):
     wordCountsInClasses = [sp.transpose(dataMat).dot(np.ones(len(docIDs), dtype=np.int32))
         for classID, (docIDs, dataMat) in classExamples.items()]
     totalWordsInClasses = [sum(classWordCounts) for classWordCounts in wordCountsInClasses]
-    #for beta in np.linspace(0,1,1000):
-    beta = .01 # This is the best preforming beta value Trevor found.
     temp = (beta)*len(ALL_WORDS)
     mapMat = np.array([(wordCountsInClasses[classID-1]+(beta))
                        /(totalWordsInClasses[classID-1]+temp)
@@ -184,16 +191,99 @@ def naiveBayesClassify(dataMat, mapMat):
     b = np.repeat(np.array([list(ALL_CLASSES.keys())]), len(likelyhoods), axis=0)
     return b[np.arange(len(likelyhoods)), np.argmax(likelyhoods, axis=1)]
 #%% Train and validate Naive Bayes with different random selections of tarining and validation sets
-metaConfusionMat = np.zeros((len(ALL_CLASSES),len(ALL_CLASSES)), dtype=np.int32)
-numValidations = 20
-for i in range(numValidations):
-    trainingClassExamples, validationClassExamples = splitClassExamples(ALL_CLASS_EXAMPLES, 0.75)
-    mapMat = naiveBayesTrain(trainingClassExamples)
-    metaConfusionMat += validateClassifier(validationClassExamples, naiveBayesClassify, mapMat=mapMat)
-#%% Plot metaConfusionMat
-metaConfusionMat = (np.vectorize(round)(metaConfusionMat / numValidations)).astype(np.int32)
-plotConfusionMat(metaConfusionMat,
-                 "Average Confusion Matrix of "+str(numValidations)+" Naive Bayes Rounds")
+avgErrorRate = 0
+avgConfusionMat = np.zeros((len(ALL_CLASSES),len(ALL_CLASSES)), dtype=np.int32)
+numDataSplits = 20
+for i in range(numDataSplits):
+    trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES, 0.75)
+    mapMat = naiveBayesTrain(trainingData)
+    errorRate, confusionMat = validateClassifier(validationData, True, naiveBayesClassify,
+                                                 mapMat=mapMat)
+    avgErrorRate += errorRate
+    avgConfusionMat += confusionMat
+avgErrorRate = round(avgErrorRate/numDataSplits, 4)
+#%% Plot avgConfusionMat
+avgConfusionMat = (np.vectorize(round)(avgConfusionMat / numDataSplits)).astype(np.int32)
+plotConfusionMat(avgConfusionMat,
+                 "Average Confusion Matrix of "+str(numDataSplits)+" Naive Bayes Rounds"
+                 +"\nAverage Error Rate = "+str(avgErrorRate))
 #%% Test Naive Bayes
 testClassifier(TEST_EXAMPLES, naiveBayesClassify, mapMat=mapMat)
 reportRunTime("Naive Bayes training, validating and testing")
+#%% Define beta error rate calculator function
+def getBetaErrorRates(numBetas=100, numDataSplits=10, start=-5, stop=0):
+    betaAndErRts = {beta : 0 for beta in np.logspace(start, stop, numBetas)}
+    for i in range(numDataSplits):
+        trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES,0.75)
+        for beta, avgErrorRate in betaAndErRts.items():
+            mapMat = naiveBayesTrain(trainingData, beta)
+            errorRate = validateClassifier(validationData, False, naiveBayesClassify, mapMat=mapMat)
+            betaAndErRts[beta] = avgErrorRate + errorRate
+    return {beta : avgErrorRate/numDataSplits for beta, avgErrorRate in betaAndErRts.items()}
+    #%% Find best beta
+if False:
+    betaAndErRts = getBetaErrorRates(2000, 20)
+    with open(nowStr()+"ErrorRatesAcrossBetas.pkl", 'wb') as betaAndErRtsPklFile:
+        pickle.dump(betaAndErRts, betaAndErRtsPklFile)
+        betaAndErRtsPklFile.close()
+    bestBeta, lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt : betaAndErRt[1])
+    #%% Plot betas
+    betaErRtFig, betaErRtAx = plt.subplots(figsize=(10, 10))
+    betaErRtIm = betaErRtAx.plot(*zip(*(betaAndErRts.items())))
+    betaErRtAx.set_xscale('log')
+    betaErRtAx.set_xlabel("Beta")
+    betaErRtAx.set_ylabel("Average Error Rate")
+    betaErRtAx.set_title("Error Rates Across Beta Values", size=14)
+    betaErRtFig.tight_layout()
+    betaErRtFig.savefig(nowStr()+'BetaErrorRates.png')
+    betaErRtFig.tight_layout()
+    plt.show()
+#%% Logistic Regression
+def mashEverythingBackTogether(classExamples):
+    deltaMat = sp.sparse.block_diag([np.array([1]*len(docIDs), dtype=np.int8)
+                                     for docIDs, dataMat in classExamples.values()])
+    wholeDataMat = sp.sparse.vstack([dataMat for docIDs, dataMat in classExamples.values()])
+    return wholeDataMat, deltaMat
+
+examplesWithImaginedWord = {classId : (docID, 
+                                       sp.sparse.hstack([sp.ones((dataMat.shape[0],1)), dataMat], 
+                                                         'csr', np.int32))
+                            for classId, (docID, dataMat) in ALL_CLASS_EXAMPLES.items()}
+trainingData, validationData = splitClassExamples(examplesWithImaginedWord, 0.75)
+weightsMat = np.matrix(np.zeros((len(ALL_CLASSES.keys()),len(ALL_WORDS)+1)))
+learningRate = 0.01
+penaltyStrength = 0.01
+mashedTrainingData, deltaMat = mashEverythingBackTogether(trainingData)
+
+normingDenominators = (mashedTrainingData.sum(axis=0)+1)
+
+normedMashedTrainingData = mashedTrainingData / normingDenominators
+
+def probMat(weightsMat, dataMat):
+    preNormed = np.exp(weightsMat * dataMat.transpose())
+    normed = preNormed / (preNormed.sum(axis=0)+1)
+    return normed
+
+for i in range(10):
+    print(weightsMat)
+    weightsMat = weightsMat + learningRate * (
+            (deltaMat - probMat(weightsMat, normedMashedTrainingData)) * normedMashedTrainingData 
+            - penaltyStrength * weightsMat)
+    reportRunTime("Weight iteration "+str(i))
+with open(nowStr()+"LogisticRegressionWeightsAfter"+str(i+1)+".pkl", 'wb') as weightsPklFile:
+    pickle.dump(weightsMat, weightsPklFile)
+    weightsPklFile.close()
+
+
+def logisticRegressionClassify(dataMat, weightsMat):
+    if dataMat.shape[1] == len(ALL_WORDS.keys()):
+        dataMat = sp.sparse.hstack([sp.ones((dataMat.shape[0],1)), dataMat], 'csr', np.int32)
+    likelyhoods = dataMat.dot(weightsMat.transpose())
+    return np.array((np.argmax(likelyhoods, axis=1) + 1).flatten().tolist()[0])
+
+predictions = logisticRegressionClassify(TEST_EXAMPLES[1], weightsMat)
+
+errorRate, confMat = validateClassifier(validationData, True, logisticRegressionClassify,
+                                        weightsMat=weightsMat)
+plotConfusionMat(confMat, "Confusion Matrix\nError Rate = "+str(errorRate))
+testClassifier(TEST_EXAMPLES, logisticRegressionClassify, weightsMat=weightsMat)
