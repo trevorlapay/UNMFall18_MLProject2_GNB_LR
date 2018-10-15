@@ -11,6 +11,8 @@ import math
 
 PKL_FILE_NAME = "ConstructionZone2Vars.pkl"
 DO_NAIVE_BAYES = False
+DO_NAIVE_BAYES_BETA_SEARCHING = False
+DO_LOGISTIC_REGRESSION = True
 
 #%% Define time related items
 sTime = time.time()
@@ -197,6 +199,47 @@ def naiveBayesClassify(dataMat, mapMat, priors):
     likelyhoods = dataMat.dot(mapMat.transpose()) + priors
     b = np.repeat(np.array([list(ALL_CLASSES.keys())]), len(likelyhoods), axis=0)
     return b[np.arange(len(likelyhoods)), np.argmax(likelyhoods, axis=1)]
+#%% Define beta error rate functions
+def getBetaErrorRates(numBetas=100, numDataSplits=10, start=-5, stop=0):
+    betaAndErRts = {beta : 0 for beta in np.logspace(start, stop, numBetas)}
+    oldBestBeta = 1
+    for i in range(1, numDataSplits + 1):
+        trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES,0.75)
+        for beta, avgErrorRate in betaAndErRts.items():
+            mapMat, priors = naiveBayesTrain(trainingData, beta)
+            errorRate = validateClassifier(validationData, False, naiveBayesClassify, 
+                                           mapMat=mapMat, priors=priors)
+            betaAndErRts[beta] = ((i - 1) * avgErrorRate + errorRate) / i
+        reportRunTime("Got {} beta error rates for split {}/{}".format(numBetas, i, numDataSplits))
+        fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,i)
+        with open(fileName, 'wb') as betaAndErRtsPklFile:
+            pickle.dump(betaAndErRts, betaAndErRtsPklFile)
+            betaAndErRtsPklFile.close()
+        bestBeta,lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt: betaAndErRt[1])
+        if oldBestBeta != bestBeta:
+            print("bestBeta changed from {} to {}".format(oldBestBeta, bestBeta))
+            oldBestBeta = bestBeta
+        else:
+            print("bestBeta stayed "+str(oldBestBeta))
+    return betaAndErRts
+def plotErrorRatesAccrossBetas(betaAndErRts, fileName="BetaErrorRates"):
+    betaErRtFig, betaErRtAx = plt.subplots(figsize=(10, 10))
+    betaErRtIm = betaErRtAx.plot(*zip(*(betaAndErRts.items())))
+    betaErRtAx.set_xscale('log')
+    betaErRtAx.set_xlabel("Beta")
+    betaErRtAx.set_ylabel("Average Error Rate")
+    betaErRtAx.set_title("Error Rates Across Beta Values", size=14)
+    bestBeta, lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt : betaAndErRt[1])
+    text = "beta={:.4f}, error rate={:.4f}".format(bestBeta, lowestErrorRate)
+    bboxProps = dict(boxstyle="square,pad=0.2", fc="w", lw=0.5)
+    arrowProps = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=60")
+    betaErRtAx.annotate(text, xy=(bestBeta, lowestErrorRate), xytext=(0.6,0.025), xycoords='data',
+                        textcoords="axes fraction", arrowprops=arrowProps, bbox=bboxProps, ha="right",
+                        va="top")
+    betaErRtFig.tight_layout()
+    betaErRtFig.savefig(nowStr()+fileName+".png")
+    betaErRtFig.tight_layout()
+    plt.show()
 if DO_NAIVE_BAYES:
     #%% Train and validate Naive Bayes with random subsets
     avgErrorRate = 0
@@ -218,67 +261,27 @@ if DO_NAIVE_BAYES:
     #%% Test Naive Bayes
     testClassifier(TEST_EXAMPLES, naiveBayesClassify, mapMat=mapMat, priors=priors)
     reportRunTime("Naive Bayes training, validating and testing")
-    #%% Define beta error rate functions
-    def getBetaErrorRates(numBetas=100, numDataSplits=10, start=-5, stop=0):
-        betaAndErRts = {beta : 0 for beta in np.logspace(start, stop, numBetas)}
-        oldBestBeta = 1
-        for i in range(1, numDataSplits + 1):
-            trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES,0.75)
-            for beta, avgErrorRate in betaAndErRts.items():
-                mapMat, priors = naiveBayesTrain(trainingData, beta)
-                errorRate = validateClassifier(validationData, False, naiveBayesClassify, 
-                                               mapMat=mapMat, priors=priors)
-                betaAndErRts[beta] = ((i - 1) * avgErrorRate + errorRate) / i
-            reportRunTime("Got {} beta error rates for split {}/{}".format(numBetas, i, numDataSplits))
-            fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,i)
-            with open(fileName, 'wb') as betaAndErRtsPklFile:
-                pickle.dump(betaAndErRts, betaAndErRtsPklFile)
-                betaAndErRtsPklFile.close()
-            bestBeta,lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt: betaAndErRt[1])
-            if oldBestBeta != bestBeta:
-                print("bestBeta changed from {} to {}".format(oldBestBeta, bestBeta))
-                oldBestBeta = bestBeta
-            else:
-                print("bestBeta stayed "+str(oldBestBeta))
-        return betaAndErRts
-    def plotErrorRatesAccrossBetas(betaAndErRts, fileName="BetaErrorRates"):
-        betaErRtFig, betaErRtAx = plt.subplots(figsize=(10, 10))
-        betaErRtIm = betaErRtAx.plot(*zip(*(betaAndErRts.items())))
-        betaErRtAx.set_xscale('log')
-        betaErRtAx.set_xlabel("Beta")
-        betaErRtAx.set_ylabel("Average Error Rate")
-        betaErRtAx.set_title("Error Rates Across Beta Values", size=14)
-        bestBeta, lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt : betaAndErRt[1])
-        text = "beta={:.4f}, error rate={:.4f}".format(bestBeta, lowestErrorRate)
-        bboxProps = dict(boxstyle="square,pad=0.2", fc="w", lw=0.5)
-        arrowProps = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=60")
-        betaErRtAx.annotate(text, xy=(bestBeta, lowestErrorRate), xytext=(0.6,0.025), xycoords='data',
-                            textcoords="axes fraction", arrowprops=arrowProps, bbox=bboxProps, ha="right",
-                            va="top")
-        betaErRtFig.tight_layout()
-        betaErRtFig.savefig(nowStr()+fileName+".png")
-        betaErRtFig.tight_layout()
-        plt.show()
-    #%% Find best beta
-    numBetas = 2000
-    numDataSplits = 20
-    try:
-        for i in range(1, numDataSplits + 1):
-            fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,i)
-            with open(fileName, 'rb') as betaAndErRtsPklFile:
-                betaAndErRts = pickle.load(betaAndErRtsPklFile)
-                betaAndErRtsPklFile.close()
-            plotErrorRatesAccrossBetas(betaAndErRts, "BetaErrorRatesAvgOver{}splits".format(i))
-    except:
+    if DO_NAIVE_BAYES_BETA_SEARCHING:
+        #%% Find best beta
+        numBetas = 2000
+        numDataSplits = 20
         try:
-            fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,numDataSplits)
-            with open(fileName, 'rb') as betaAndErRtsPklFile:
-                betaAndErRts = pickle.load(betaAndErRtsPklFile)
-                betaAndErRtsPklFile.close()
-            plotErrorRatesAccrossBetas(betaAndErRts)
+            for i in range(1, numDataSplits + 1):
+                fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,i)
+                with open(fileName, 'rb') as betaAndErRtsPklFile:
+                    betaAndErRts = pickle.load(betaAndErRtsPklFile)
+                    betaAndErRtsPklFile.close()
+                plotErrorRatesAccrossBetas(betaAndErRts, "BetaErrorRatesAvgOver{}splits".format(i))
         except:
-            betaAndErRts = getBetaErrorRates(numBetas, numDataSplits)
-            plotErrorRatesAccrossBetas(betaAndErRts)
+            try:
+                fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,numDataSplits)
+                with open(fileName, 'rb') as betaAndErRtsPklFile:
+                    betaAndErRts = pickle.load(betaAndErRtsPklFile)
+                    betaAndErRtsPklFile.close()
+                plotErrorRatesAccrossBetas(betaAndErRts)
+            except:
+                betaAndErRts = getBetaErrorRates(numBetas, numDataSplits)
+                plotErrorRatesAccrossBetas(betaAndErRts)
 #%% Define logistic regression functions
 def mashEverythingBackTogether(classExamples):
     deltaMat = sp.sparse.block_diag([np.array([1]*len(docIDs), dtype=np.int8)
@@ -320,20 +323,21 @@ def logisticRegressionClassify(dataMat, svd, normingDenominators, weightsMat):
     dataMat = dataMat / normingDenominators
     likelyhoods = dataMat * weightsMat.transpose()
     return np.array((np.argmax(likelyhoods, axis=1) + 1).flatten().tolist()[0])
-#%% Train, validate and test logistic regression
-svd, normingDenominators, deltaMat, preprocDataMat = preprocessData(trainingData)
-errorRates = []
-numIters = np.array([10000])#np.round(np.logspace(3.75, 4.5, 2)).astype(np.int64)
-for numIter in numIters:
-    weightsMat = logisticRegressionTrain(preprocDataMat, deltaMat,
-                                         numIter=numIter,
-                                         learnRate=0.01, 
-                                         penalty=0.01)
-    errorRates.append(validateClassifier(validationData, False, logisticRegressionClassify, svd=svd,
-                                         normingDenominators=normingDenominators,
-                                         weightsMat=weightsMat))
-    print("Error Rate = {:.4f} for {} iterations".format(errorRates[-1], numIter))
-plt.plot(numIters, np.array(errorRates))
-#plotConfusionMat(confMat, "Confusion Matrix\nError Rate = "+str(errorRate))
-#testClassifier(TEST_EXAMPLES, logisticRegressionClassify, svd=svd,
-#               normingDenominators=normingDenominators, weightsMat=weightsMat)
+if DO_LOGISTIC_REGRESSION:
+    #%% Train, validate and test logistic regression
+    svd, normingDenominators, deltaMat, preprocDataMat = preprocessData(trainingData)
+    errorRates = []
+    numIters = np.array([10000])#np.round(np.logspace(3.75, 4.5, 2)).astype(np.int64)
+    for numIter in numIters:
+        weightsMat = logisticRegressionTrain(preprocDataMat, deltaMat,
+                                             numIter=numIter,
+                                             learnRate=0.01, 
+                                             penalty=0.01)
+        errorRates.append(validateClassifier(validationData, False, logisticRegressionClassify, svd=svd,
+                                             normingDenominators=normingDenominators,
+                                             weightsMat=weightsMat))
+        print("Error Rate = {:.4f} for {} iterations".format(errorRates[-1], numIter))
+    plt.plot(numIters, np.array(errorRates))
+    #plotConfusionMat(confMat, "Confusion Matrix\nError Rate = "+str(errorRate))
+    #testClassifier(TEST_EXAMPLES, logisticRegressionClassify, svd=svd,
+    #               normingDenominators=normingDenominators, weightsMat=weightsMat)
