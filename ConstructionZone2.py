@@ -70,8 +70,8 @@ except Exception as err:
     #%% Create ALL_CLASS_EXAMPLES.
     # ALL_CLASS_EXAMPLES is a dictionary with class IDs as keys and tuples as values. The first item
     # of the tuple is the list of Document IDs matching the class in the key. The second item of the
-    # tuple is a matrix where every row corresponds to a document in the list of document IDs and 
-    # every column corresponds to a word in the vocabulary. Every cell in this matrix is the count 
+    # tuple is a matrix where every row corresponds to a document in the list of document IDs and
+    # every column corresponds to a word in the vocabulary. Every cell in this matrix is the count
     # of the column's word in the row's document.
     ALL_CLASS_EXAMPLES = {classID : (list(examples['docID']),
                                      sp.sparse.csr_matrix(examples[list(ALL_WORDS.keys())]))
@@ -207,7 +207,7 @@ def getBetaErrorRates(numBetas=100, numDataSplits=10, start=-5, stop=0):
         trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES,0.75)
         for beta, avgErrorRate in betaAndErRts.items():
             mapMat, priors = naiveBayesTrain(trainingData, beta)
-            errorRate = validateClassifier(validationData, False, naiveBayesClassify, 
+            errorRate = validateClassifier(validationData, False, naiveBayesClassify,
                                            mapMat=mapMat, priors=priors)
             betaAndErRts[beta] = ((i - 1) * avgErrorRate + errorRate) / i
         reportRunTime("Got {} beta error rates for split {}/{}".format(numBetas, i, numDataSplits))
@@ -331,7 +331,7 @@ if DO_LOGISTIC_REGRESSION:
     for numIter in numIters:
         weightsMat = logisticRegressionTrain(preprocDataMat, deltaMat,
                                              numIter=numIter,
-                                             learnRate=learnRate, 
+                                             learnRate=learnRate,
                                              penalty=penalty)
         errorRates.append(validateClassifier(validationData, False, logisticRegressionClassify,
                                              svd=svd,
