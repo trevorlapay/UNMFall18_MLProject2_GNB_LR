@@ -10,8 +10,8 @@ import random
 import math
 
 PKL_FILE_NAME = "ConstructionZone2Vars.pkl"
-DO_NAIVE_BAYES = True
-DO_NAIVE_BAYES_BETA_SEARCHING = True
+DO_NAIVE_BAYES = False
+DO_NAIVE_BAYES_BETA_SEARCHING = False
 DO_LOGISTIC_REGRESSION = True
 
 #%% Define time related items
@@ -297,9 +297,21 @@ examplesWithImaginedWord = {classId : (docID,
                                                         'csr', np.int32))
                             for classId, (docID, dataMat) in ALL_CLASS_EXAMPLES.items()}
 trainingData, validationData = splitClassExamples(examplesWithImaginedWord, 0.75)
-def preprocessData(trainingData):
+class AntiDimRed(object):
+    """docstring for AntiDimRed"""
+    def __init__(self, arg=None):
+        super(AntiDimRed, self).__init__()
+        self.arg = arg
+    def transform(self, dataMat):
+        return dataMat
+    def fit_transform(self, dataMat):
+        return dataMat
+def preprocessData(trainingData, doDimRed=True):
     mashedTrainingData, deltaMat = mashEverythingBackTogether(trainingData)
-    svd = TruncatedSVD(n_components=500)
+    if doDimRed:
+        svd = TruncatedSVD(n_components=500)
+    else:
+        svd = AntiDimRed()
     dimRedMashedData = svd.fit_transform(mashedTrainingData)
     normingDenominators = np.abs(dimRedMashedData.sum(axis=0)) + 1
     normedDimRedMashedData = dimRedMashedData / normingDenominators
@@ -326,7 +338,7 @@ def logisticRegressionClassify(dataMat, svd, normingDenominators, weightsMat):
     return np.array((np.argmax(likelyhoods, axis=1) + 1).flatten().tolist()[0])
 if DO_LOGISTIC_REGRESSION:
     #%% Train, validate and test logistic regression
-    svd, normingDenominators, deltaMat, preprocDataMat = preprocessData(trainingData)
+    svd, normingDenominators, deltaMat, preprocDataMat = preprocessData(trainingData, False)
     errorRates = []
     learnRate = 0.01
     penalty = 0.01
