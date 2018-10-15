@@ -10,8 +10,8 @@ import random
 import math
 
 PKL_FILE_NAME = "ConstructionZone2Vars.pkl"
-DO_NAIVE_BAYES = False
-DO_NAIVE_BAYES_BETA_SEARCHING = False
+DO_NAIVE_BAYES = True
+DO_NAIVE_BAYES_BETA_SEARCHING = True
 DO_LOGISTIC_REGRESSION = True
 
 #%% Define time related items
@@ -21,15 +21,27 @@ def reportRunTime(taskStr):
     print(taskStr + " in {:.2f} sec".format(time.time()-sTime))
     sTime = time.time()
 def nowStr(): return time.strftime("%Y-%m-%d_%H-%M-%S")
+#%% Define pickle file functions
+def savePickle(obj, fileName=None):
+    if fileName == None: fileName = nowStr()+"pickleFile.pkl"
+    if fileName[-4:] != ".pkl": fileName += ".pkl"
+    with open(fileName, 'wb') as pklFile:
+        pickle.dump(obj, pklFile)
+        pklFile.close()
+def loadPickle(fileName="pickleFile.pkl"):
+    if fileName[-4:] != ".pkl": fileName += ".pkl"
+    obj = None
+    with open(fileName, 'rb') as pklFile:
+        obj = pickle.load(pklFile)
+        pklFile.close()
+    return obj
 #%% Load basic data (previously read, derived and saved).
 try:
-    with open(PKL_FILE_NAME, 'rb') as pklFile:
-        (ALL_CLASSES,
-         ALL_WORDS,
-         ALL_CLASS_EXAMPLES,
-         TEST_EXAMPLES) = pickle.load(pklFile)
-        pklFile.close()
-        reportRunTime("Loaded variables")
+    (ALL_CLASSES,
+     ALL_WORDS,
+     ALL_CLASS_EXAMPLES,
+     TEST_EXAMPLES) = loadPickle(PKL_FILE_NAME)
+    reportRunTime("Loaded variables")
 except Exception as err:
     print("Could not load variables from pkl file. Error details:")
     print(type(err))
@@ -98,27 +110,24 @@ except Exception as err:
     testingDF = None
     del testingDF
     #%% Dump variables.
-    with open(PKL_FILE_NAME, 'wb') as pklFile:
-        pickle.dump((ALL_CLASSES,
-                     ALL_WORDS,
-                     ALL_CLASS_EXAMPLES,
-                     TEST_EXAMPLES), pklFile)
-        pklFile.close()
-        reportRunTime("Dumped variables")
+    savePickle((ALL_CLASSES,
+                ALL_WORDS,
+                ALL_CLASS_EXAMPLES,
+                TEST_EXAMPLES), PKL_FILE_NAME)
+    reportRunTime("Dumped variables")
 #%% Define data splitting functions.
 def getSubset(examples, rows):
     docIDs, dataMat = examples
     return [docIDs[row] for row in rows], dataMat[rows,:]
-
-def splitExamples(examples, splitProportion = 0.5):
+def splitExamples(examples, splitProportion=0.5):
     docIDs, dataMat = examples
     assert (len(docIDs) > 1), "Cannot split only one example."
     rows = list(range(len(docIDs)))
     random.shuffle(rows)
     splitIndex = round(splitProportion*len(docIDs))
-    if splitIndex >= len(rows)-1: splitIndex -= 1
+    if splitIndex >= len(rows): splitIndex = len(rows)-1
+    if splitIndex <= 0: splitIndex = 1
     return getSubset(examples, rows[:splitIndex]), getSubset(examples, rows[splitIndex:])
-
 def splitClassExamples(classExamples, splitProportion = 0.5):
     subSet1 = {}
     subSet2 = {}
@@ -144,9 +153,10 @@ def validateClassifier(classExamples, returnConfMat, classifyFunc, **kwargs):
     if returnConfMat: return errorRate, confusionMat
     else: return errorRate
 def testClassifier(examples, classifyFunc, **kwargs):
-    predictions = classifyFunc(examples[1], **kwargs)
+    docIDs, dataMat = examples
+    predictions = classifyFunc(dataMat, **kwargs)
     answersDF = pd.DataFrame()
-    answersDF['id'] = pd.Series(examples[0])
+    answersDF['id'] = pd.Series(docIDs)
     answersDF['class'] = pd.Series(predictions)
     answersDF.to_csv(nowStr()+'answers.csv', index=False)
 #%% Define confusion matrix plotting function
@@ -177,7 +187,7 @@ def plotConfusionMat(confMat, title="Confusion Matrix"):
                 confMatAx.text(j, i, confMat[i,j], ha="center", va="center", size=10, color=color)
     confMatAx.set_title(title, size=16)
     confMatFig.tight_layout()
-    confMatFig.savefig(nowStr()+'confusionMatrix.png')
+    confMatFig.savefig(nowStr()+'ConfusionMatrix.png')
     plt.show()
 #%% Define Naive Bayes functions
 def naiveBayesTrain(classExamples, beta=0.0267, asLog=True):
@@ -204,17 +214,15 @@ def getBetaErrorRates(numBetas=100, numDataSplits=10, start=-5, stop=0):
     betaAndErRts = {beta : 0 for beta in np.logspace(start, stop, numBetas)}
     oldBestBeta = 1
     for i in range(1, numDataSplits + 1):
-        trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES,0.75)
+        trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES, 0.75)
         for beta, avgErrorRate in betaAndErRts.items():
             mapMat, priors = naiveBayesTrain(trainingData, beta)
             errorRate = validateClassifier(validationData, False, naiveBayesClassify,
                                            mapMat=mapMat, priors=priors)
             betaAndErRts[beta] = ((i - 1) * avgErrorRate + errorRate) / i
         reportRunTime("Got {} beta error rates for split {}/{}".format(numBetas, i, numDataSplits))
-        fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,i)
-        with open(fileName, 'wb') as betaAndErRtsPklFile:
-            pickle.dump(betaAndErRts, betaAndErRtsPklFile)
-            betaAndErRtsPklFile.close()
+        fileName = "AvgErrorRatesAcross{}BetasOver{}Splits".format(numBetas,i)
+        savePickle(betaAndErRts, fileName)
         bestBeta,lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt: betaAndErRt[1])
         if oldBestBeta != bestBeta:
             print("bestBeta changed from {} to {}".format(oldBestBeta, bestBeta))
@@ -267,18 +275,13 @@ if DO_NAIVE_BAYES:
         numDataSplits = 20
         try:
             for i in range(1, numDataSplits + 1):
-                fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,i)
-                with open(fileName, 'rb') as betaAndErRtsPklFile:
-                    betaAndErRts = pickle.load(betaAndErRtsPklFile)
-                    betaAndErRtsPklFile.close()
+                fileName = "AvgErrorRatesAcross{}BetasOver{}Splits".format(numBetas,i)
+                betaAndErRts = loadPickle(fileName)
                 plotErrorRatesAccrossBetas(betaAndErRts, "BetaErrorRatesAvgOver{}splits".format(i))
         except:
             try:
-                fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,
-                                                                               numDataSplits)
-                with open(fileName, 'rb') as betaAndErRtsPklFile:
-                    betaAndErRts = pickle.load(betaAndErRtsPklFile)
-                    betaAndErRtsPklFile.close()
+                fileName = "AvgErrorRatesAcross{}BetasOver{}Splits".format(numBetas, numDataSplits)
+                betaAndErRts = loadPickle(fileName)
                 plotErrorRatesAccrossBetas(betaAndErRts)
             except:
                 betaAndErRts = getBetaErrorRates(numBetas, numDataSplits)
@@ -327,7 +330,7 @@ if DO_LOGISTIC_REGRESSION:
     errorRates = []
     learnRate = 0.01
     penalty = 0.01
-    numIters = np.array([1000])#np.round(np.logspace(3.75, 4.5, 5)).astype(np.int64)
+    numIters = np.array([1,10,100,1000])#np.round(np.logspace(3.75, 4.5, 5)).astype(np.int64)
     for numIter in numIters:
         weightsMat = logisticRegressionTrain(preprocDataMat, deltaMat,
                                              numIter=numIter,
@@ -338,11 +341,9 @@ if DO_LOGISTIC_REGRESSION:
                                              normingDenominators=normingDenominators,
                                              weightsMat=weightsMat))
         print("Error Rate = {:.4f} for {} iterations".format(errorRates[-1], numIter))
-        fileName = "LR{:.4f}ErrRt{}Iters{}LearnRt{}Penalty.pkl".format(errorRates[-1], numIter,
+        fileName = "LR{:.4f}ErrRt{}Iters{}LearnRt{}Penalty".format(errorRates[-1], numIter,
                                                                    learnRate, penalty)
-        with open(fileName, 'wb') as lrTrainingPklFile:
-            pickle.dump((svd, normingDenominators, weightsMat), lrTrainingPklFile)
-            lrTrainingPklFile.close()
+        savePickle((svd, normingDenominators, weightsMat), fileName)
     plt.plot(numIters, np.array(errorRates))
     #plotConfusionMat(confMat, "Confusion Matrix\nError Rate = "+str(errorRate))
     #testClassifier(TEST_EXAMPLES, logisticRegressionClassify, svd=svd,
