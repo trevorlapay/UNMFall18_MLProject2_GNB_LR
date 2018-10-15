@@ -327,7 +327,7 @@ if DO_LOGISTIC_REGRESSION:
     errorRates = []
     learnRate = 0.01
     penalty = 0.01
-    numIters = np.array([10000])#np.round(np.logspace(3.75, 4.5, 5)).astype(np.int64)
+    numIters = np.array([1000])#np.round(np.logspace(3.75, 4.5, 5)).astype(np.int64)
     for numIter in numIters:
         weightsMat = logisticRegressionTrain(preprocDataMat, deltaMat,
                                              numIter=numIter,
@@ -338,7 +338,7 @@ if DO_LOGISTIC_REGRESSION:
                                              normingDenominators=normingDenominators,
                                              weightsMat=weightsMat))
         print("Error Rate = {:.4f} for {} iterations".format(errorRates[-1], numIter))
-        fileName = "LR{}ErrRt{}Iters{}LearnRt{}Penalty.pkl".format(errorRates[-1], numIter,
+        fileName = "LR{:.4f}ErrRt{}Iters{}LearnRt{}Penalty.pkl".format(errorRates[-1], numIter,
                                                                    learnRate, penalty)
         with open(fileName, 'wb') as lrTrainingPklFile:
             pickle.dump((svd, normingDenominators, weightsMat), lrTrainingPklFile)
