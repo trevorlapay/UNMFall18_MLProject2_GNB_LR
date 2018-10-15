@@ -323,15 +323,17 @@ def logisticRegressionClassify(dataMat, svd, normingDenominators, weightsMat):
 #%% Train, validate and test logistic regression
 svd, normingDenominators, deltaMat, preprocDataMat = preprocessData(trainingData)
 errorRates = []
-for numIter in np.round(np.logspace(2, 4, 10)):
+numIters = np.array([10000])#np.round(np.logspace(3.75, 4.5, 2)).astype(np.int64)
+for numIter in numIters:
     weightsMat = logisticRegressionTrain(preprocDataMat, deltaMat,
-                                         numIter=int(numIter),
+                                         numIter=numIter,
                                          learnRate=0.01, 
                                          penalty=0.01)
     errorRates.append(validateClassifier(validationData, False, logisticRegressionClassify, svd=svd,
                                          normingDenominators=normingDenominators,
                                          weightsMat=weightsMat))
-plt.plot(np.round(np.logspace(2, 5, 10)), np.array(errorRates))
+    print("Error Rate = {:.4f} for {} iterations".format(errorRates[-1], numIter))
+plt.plot(numIters, np.array(errorRates))
 #plotConfusionMat(confMat, "Confusion Matrix\nError Rate = "+str(errorRate))
 #testClassifier(TEST_EXAMPLES, logisticRegressionClassify, svd=svd,
 #               normingDenominators=normingDenominators, weightsMat=weightsMat)
