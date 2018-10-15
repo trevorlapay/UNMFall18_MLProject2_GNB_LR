@@ -234,8 +234,8 @@ def plotErrorRatesAccrossBetas(betaAndErRts, fileName="BetaErrorRates"):
     bboxProps = dict(boxstyle="square,pad=0.2", fc="w", lw=0.5)
     arrowProps = dict(arrowstyle="->", connectionstyle="angle,angleA=0,angleB=60")
     betaErRtAx.annotate(text, xy=(bestBeta, lowestErrorRate), xytext=(0.6,0.025), xycoords='data',
-                        textcoords="axes fraction", arrowprops=arrowProps, bbox=bboxProps, ha="right",
-                        va="top")
+                        textcoords="axes fraction", arrowprops=arrowProps, bbox=bboxProps,
+                        ha="right", va="top")
     betaErRtFig.tight_layout()
     betaErRtFig.savefig(nowStr()+fileName+".png")
     betaErRtFig.tight_layout()
@@ -274,7 +274,8 @@ if DO_NAIVE_BAYES:
                 plotErrorRatesAccrossBetas(betaAndErRts, "BetaErrorRatesAvgOver{}splits".format(i))
         except:
             try:
-                fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,numDataSplits)
+                fileName = "AvgErrorRatesAcross{}BetasOver{}Splits.pkl".format(numBetas,
+                                                                               numDataSplits)
                 with open(fileName, 'rb') as betaAndErRtsPklFile:
                     betaAndErRts = pickle.load(betaAndErRtsPklFile)
                     betaAndErRtsPklFile.close()
@@ -312,9 +313,6 @@ def logisticRegressionTrain(preprocDataMat, deltaMat, numIter, learnRate=0.01, p
             - penalty * weightsMat)
         if i % 100 == 0:
             reportRunTime("Logistic regression iteration "+str(i))
-    with open(nowStr()+"LogisticRegressionWeightsAfter"+str(i+1)+".pkl", 'wb') as weightsPklFile:
-        pickle.dump(weightsMat, weightsPklFile)
-        weightsPklFile.close()
     return weightsMat
 def logisticRegressionClassify(dataMat, svd, normingDenominators, weightsMat):
     if dataMat.shape[1] == len(ALL_WORDS.keys()):
@@ -327,16 +325,24 @@ if DO_LOGISTIC_REGRESSION:
     #%% Train, validate and test logistic regression
     svd, normingDenominators, deltaMat, preprocDataMat = preprocessData(trainingData)
     errorRates = []
-    numIters = np.array([10000])#np.round(np.logspace(3.75, 4.5, 2)).astype(np.int64)
+    learnRate = 0.01
+    penalty = 0.01
+    numIters = np.array([10000])#np.round(np.logspace(3.75, 4.5, 5)).astype(np.int64)
     for numIter in numIters:
         weightsMat = logisticRegressionTrain(preprocDataMat, deltaMat,
                                              numIter=numIter,
-                                             learnRate=0.01, 
-                                             penalty=0.01)
-        errorRates.append(validateClassifier(validationData, False, logisticRegressionClassify, svd=svd,
+                                             learnRate=learnRate, 
+                                             penalty=penalty)
+        errorRates.append(validateClassifier(validationData, False, logisticRegressionClassify,
+                                             svd=svd,
                                              normingDenominators=normingDenominators,
                                              weightsMat=weightsMat))
         print("Error Rate = {:.4f} for {} iterations".format(errorRates[-1], numIter))
+        fileName = "LR{}ErrRt{}Iters{}LearnRt{}Penalty.pkl".format(errorRates[-1], numIter,
+                                                                   learnRate, penalty)
+        with open(fileName, 'wb') as lrTrainingPklFile:
+            pickle.dump((svd, normingDenominators, weightsMat), lrTrainingPklFile)
+            lrTrainingPklFile.close()
     plt.plot(numIters, np.array(errorRates))
     #plotConfusionMat(confMat, "Confusion Matrix\nError Rate = "+str(errorRate))
     #testClassifier(TEST_EXAMPLES, logisticRegressionClassify, svd=svd,
