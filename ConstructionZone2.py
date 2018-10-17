@@ -10,6 +10,7 @@ import random
 import math
 
 PKL_FILE_NAME = "ConstructionZone2Vars.pkl"
+
 #%% Decide what to do.
 DO_NAIVE_BAYES = False
 DO_NAIVE_BAYES_BETA_SEARCHING = False
@@ -17,13 +18,33 @@ DO_LOGISTIC_REGRESSION = True
 DO_NUM_INTERS_SEARCH = False
 DO_LEARN_RATE_SEARCH = True
 DO_PENALTY_SEARCH = True
+
 #%% Define time related items
-sTime = time.time()
-def reportRunTime(taskStr):
-    global sTime
-    print(taskStr + " in {:.2f} sec".format(time.time()-sTime))
-    sTime = time.time()
+class Timer(object):
+    """docstring for Timer"""
+    def __init__(self, level=0):
+        super(Timer, self).__init__()
+        self.startTimes = [time.time()]
+        self.level =  max(0, level)
+    def setLevel(self, level):
+        self.level =  max(0, level)
+    def levelUp(self):
+        self.level = max(0, self.level - 1)
+    def levelDown(self, doReset=True):
+        self.level += 1
+        if self.level == len(self.startTimes):
+            self.startTimes.append(time.time())
+        elif doReset:
+            self.startTimes[self.level] = time.time()
+    def lap(self, taskStr="Did task", doReset=True):
+        timeInterval = time.time() - self.startTimes[self.level]
+        print("    " * self.level + taskStr + " in {:.2f} sec".format(timeInterval))
+        if doReset:
+            self.reset()
+    def reset(self):
+        self.startTimes[self.level] = time.time()
 def nowStr(): return time.strftime("%Y-%m-%d_%H-%M-%S")
+
 #%% Define pickle file functions
 def savePickle(obj, fileName=None):
     if fileName is None: fileName = nowStr()+"pickleFile.pkl"
@@ -31,6 +52,7 @@ def savePickle(obj, fileName=None):
     with open(fileName, 'wb') as pklFile:
         pickle.dump(obj, pklFile)
         pklFile.close()
+
 def loadPickle(fileName="pickleFile.pkl"):
     if fileName[-4:] != ".pkl": fileName += ".pkl"
     obj = None
@@ -38,26 +60,30 @@ def loadPickle(fileName="pickleFile.pkl"):
         obj = pickle.load(pklFile)
         pklFile.close()
     return obj
+
+mainTimer = Timer()
+
 #%% Load basic data (previously read, derived and saved).
 try:
     (ALL_CLASSES,
      ALL_WORDS,
      ALL_CLASS_EXAMPLES,
      TEST_EXAMPLES) = loadPickle(PKL_FILE_NAME)
-    reportRunTime("Loaded variables")
+    mainTimer.lap("Loaded basic data from pkl file")
 except Exception as err:
-    print("Could not load variables from pkl file. Error details:")
+    print("Could not load basic data from pkl file. Error details:")
     print(type(err))
     print(err.args)
     print(err)
-    print("\nAttempting to read raw data instead.\nAll runtimes given in seconds.")
+    print("\nAttempting to laod basic data from txt and csv files instead.")
     #%% Read in ALL_CLASSES.
+    mainTimer.levelDown()
     try:
         classesFile = open('newsgrouplabels.txt', 'r')
         ALL_CLASSES = classesFile.read().splitlines()
         classesFile.close()
         ALL_CLASSES = dict(zip(range(1, len(ALL_CLASSES)+1), ALL_CLASSES))
-        reportRunTime("Read ALL_CLASSES")
+        mainTimer.lap("Read ALL_CLASSES")
     except:
         print("Could not read news groups from newsgrouplabels.txt.")
         raise
@@ -67,18 +93,18 @@ except Exception as err:
         ALL_WORDS = vocabFile.read().splitlines()
         vocabFile.close()
         ALL_WORDS = dict(zip(range(1, len(ALL_WORDS)+1), ALL_WORDS))
-        reportRunTime("Read ALL_WORDS")
+        mainTimer.lap("Read ALL_WORDS")
     except:
         print("Could not read vocabulary from vocabulary.txt.")
         raise
     #%% Create colNames.
     colNames = ['docID']+list(ALL_WORDS.keys())+['classID']
-    reportRunTime("Created colNames")
+    mainTimer.lap("Created colNames")
     #%% Read trainingDF.
     try:
         trainingDF = pd.read_csv('training.csv', header=None, dtype=np.int32,
                                  names=colNames).to_sparse(fill_value=0)
-        reportRunTime("Read trainingDF")
+        mainTimer.lap("Read trainingDF")
     except:
         print("Could not read training data from training.csv.")
         raise
@@ -91,7 +117,7 @@ except Exception as err:
     ALL_CLASS_EXAMPLES = {classID : (list(examples['docID']),
                                      sp.sparse.csr_matrix(examples[list(ALL_WORDS.keys())]))
                           for classID, examples in trainingDF.groupby('classID')}
-    reportRunTime("Created ALL_CLASS_EXAMPLES")
+    mainTimer.lap("Created ALL_CLASS_EXAMPLES")
     trainingDF = None
     del trainingDF
     docsGroupedByClass = None
@@ -100,28 +126,32 @@ except Exception as err:
     try:
         testingDF = pd.read_csv('testing.csv', header=None, dtype=np.int32,
                                 names=colNames[:-1]).to_sparse(fill_value=0)
-        reportRunTime("Read testingDF")
+        mainTimer.lap("Read testingDF")
     except:
         print("Could not read testing data from testing.csv.")
         raise
     #%% Create TEST_EXAMPLES
     # TEST_EXAMPLES is structured like one of the tuples in the ALL_CLASS_EXAMPLES dictionary.
     TEST_EXAMPLES = (testingDF['docID'].tolist(), sp.sparse.csr_matrix(testingDF[colNames[1:-1]]))
-    reportRunTime("Created TEST_EXAMPLES")
+    mainTimer.lap("Created TEST_EXAMPLES")
     colNames = None
     del colNames
     testingDF = None
     del testingDF
+    mainTimer.levelUp()
+    mainTimer.lap("Loaded basic data from txt and csv files")
     #%% Dump variables.
     savePickle((ALL_CLASSES,
                 ALL_WORDS,
                 ALL_CLASS_EXAMPLES,
                 TEST_EXAMPLES), PKL_FILE_NAME)
-    reportRunTime("Dumped variables")
+    mainTimer.lap("Dumped basic data into pkl file")
+
 #%% Define data splitting functions.
 def getSubset(examples, rows):
     docIDs, dataMat = examples
     return [docIDs[row] for row in rows], dataMat[rows,:]
+
 def splitExamples(examples, splitProportion=0.5):
     docIDs, dataMat = examples
     assert (len(docIDs) > 1), "Cannot split only one example."
@@ -131,12 +161,14 @@ def splitExamples(examples, splitProportion=0.5):
     if splitIndex >= len(rows): splitIndex = len(rows)-1
     if splitIndex <= 0: splitIndex = 1
     return getSubset(examples, rows[:splitIndex]), getSubset(examples, rows[splitIndex:])
+
 def splitClassExamples(classExamples, splitProportion = 0.5):
     subSet1 = {}
     subSet2 = {}
     for classID, examples in classExamples.items():
         subSet1[classID], subSet2[classID] = splitExamples(examples, splitProportion)
     return subSet1, subSet2
+
 #%% Define general validation and testing functions
 def validateClassifier(classExamples, returnConfMat, classifyFunc, **kwargs):
     if returnConfMat:
@@ -155,6 +187,7 @@ def validateClassifier(classExamples, returnConfMat, classifyFunc, **kwargs):
     errorRate = errorCount/exampleCount
     if returnConfMat: return errorRate, confusionMat
     else: return errorRate
+
 def testClassifier(examples, classifyFunc, **kwargs):
     docIDs, dataMat = examples
     predictions = classifyFunc(dataMat, **kwargs)
@@ -162,6 +195,7 @@ def testClassifier(examples, classifyFunc, **kwargs):
     answersDF['id'] = pd.Series(docIDs)
     answersDF['class'] = pd.Series(predictions)
     answersDF.to_csv(nowStr()+'answers.csv', index=False)
+
 #%% Define confusion matrix plotting function
 def plotConfusionMat(confMat, title="Confusion Matrix"):
     noDiagConfMat = confMat.copy()
@@ -192,6 +226,7 @@ def plotConfusionMat(confMat, title="Confusion Matrix"):
     confMatFig.tight_layout()
     confMatFig.savefig(nowStr()+'ConfusionMatrix.png')
     plt.show()
+
 #%% Define Naive Bayes functions
 def naiveBayesTrain(classExamples, beta=0.0267, asLog=True):
     classDocCounts = [len(docIDs) for classID, (docIDs, dataMat) in classExamples.items()]
@@ -208,22 +243,26 @@ def naiveBayesTrain(classExamples, beta=0.0267, asLog=True):
         return np.vectorize(math.log2)(mapMat), np.vectorize(math.log2)(priors)
     else:
         return mapMat, priors
+
 def naiveBayesClassify(dataMat, mapMat, priors):
     likelyhoods = dataMat.dot(mapMat.transpose()) + priors
     b = np.repeat(np.array([list(ALL_CLASSES.keys())]), len(likelyhoods), axis=0)
     return b[np.arange(len(likelyhoods)), np.argmax(likelyhoods, axis=1)]
+
 #%% Define beta error rate functions
 def getBetaErrorRates(numBetas=100, numDataSplits=10, start=-5, stop=0):
+    mainTimer.levelDown()
     betaAndErRts = {beta : 0 for beta in np.logspace(start, stop, numBetas)}
     oldBestBeta = 1
     for i in range(1, numDataSplits + 1):
+        mainTimer.reset()
         trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES, 0.75)
         for beta, avgErrorRate in betaAndErRts.items():
             mapMat, priors = naiveBayesTrain(trainingData, beta)
             errorRate = validateClassifier(validationData, False, naiveBayesClassify,
                                            mapMat=mapMat, priors=priors)
             betaAndErRts[beta] = ((i - 1) * avgErrorRate + errorRate) / i
-        reportRunTime("Got {} beta error rates for split {}/{}".format(numBetas, i, numDataSplits))
+        mainTimer.lap("Got {} beta error rates for split {}/{}".format(numBetas, i, numDataSplits))
         fileName = "AvgErrorRatesAcross{}BetasOver{}Splits".format(numBetas,i)
         savePickle(betaAndErRts, fileName)
         bestBeta,lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt: betaAndErRt[1])
@@ -232,7 +271,9 @@ def getBetaErrorRates(numBetas=100, numDataSplits=10, start=-5, stop=0):
             oldBestBeta = bestBeta
         else:
             print("bestBeta stayed "+str(oldBestBeta))
+    mainTimer.levelUp()
     return betaAndErRts
+
 def plotErrorRatesAccrossBetas(betaAndErRts, fileName="BetaErrorRates"):
     betaErRtFig, betaErRtAx = plt.subplots(figsize=(10, 10))
     betaErRtIm = betaErRtAx.plot(*zip(*(betaAndErRts.items())))
@@ -251,6 +292,7 @@ def plotErrorRatesAccrossBetas(betaAndErRts, fileName="BetaErrorRates"):
     betaErRtFig.savefig(nowStr()+fileName+".png")
     betaErRtFig.tight_layout()
     plt.show()
+
 if DO_NAIVE_BAYES:
     #%% Train and validate Naive Bayes with random subsets
     avgErrorRate = 0
@@ -271,7 +313,8 @@ if DO_NAIVE_BAYES:
                      +"\nAverage Error Rate = "+str(avgErrorRate))
     #%% Test Naive Bayes
     testClassifier(TEST_EXAMPLES, naiveBayesClassify, mapMat=mapMat, priors=priors)
-    reportRunTime("Naive Bayes training, validating and testing")
+    mainTimer.lap("Naive Bayes training, validating and testing")
+    
     if DO_NAIVE_BAYES_BETA_SEARCHING:
         #%% Find best beta
         numBetas = 2000
@@ -287,14 +330,19 @@ if DO_NAIVE_BAYES:
                 betaAndErRts = loadPickle(fileName)
                 plotErrorRatesAccrossBetas(betaAndErRts)
             except:
+                mainTimer.reset()
                 betaAndErRts = getBetaErrorRates(numBetas, numDataSplits)
                 plotErrorRatesAccrossBetas(betaAndErRts)
+                mainTimer.lap("Found best beta")
+                
+
 #%% Define logistic regression functions
 def mashEverythingBackTogether(classExamples):
     deltaMat = sp.sparse.block_diag([np.array([1]*len(docIDs), dtype=np.int8)
                                      for docIDs, dataMat in classExamples.values()])
     wholeDataMat = sp.sparse.vstack([dataMat for docIDs, dataMat in classExamples.values()])
     return wholeDataMat, deltaMat
+
 class AntiDimRed(object):
     """docstring for AntiDimRed"""
     def __init__(self, arg=None):
@@ -304,88 +352,124 @@ class AntiDimRed(object):
         return dataMat
     def fit_transform(self, dataMat):
         return dataMat
+
 def prependOnesColumn(dataMat):
-    # TODO Test prependOnesColumn function.
     if sp.sparse.issparse(dataMat):
         return sp.sparse.hstack([sp.ones((dataMat.shape[0],1)), dataMat], 'csr', np.int32)
     else:
-        return np.hstack([np.ones((dataMat.shape[0],1)), dataMat], dtype=np.int32)
-def preprocessData(trainingData, doDimRed=True):
+        return np.hstack((np.ones((dataMat.shape[0],1)), dataMat))
+
+def preprocessTrainingData(trainingData, reduceDimTo=0):
     dataMat, deltaMat = mashEverythingBackTogether(trainingData)
-    if doDimRed:
-        svd = TruncatedSVD(n_components=1000)
+    mainTimer.reset()
+    mainTimer.levelDown()
+    if reduceDimTo >= 2:
+        svd = TruncatedSVD(n_components=reduceDimTo)
     else:
         svd = AntiDimRed()
-    dataMat = svd.fit_transform(dataMat)
-    # Add column of ones at the beguining of dataMat
-    dataMat = prependOnesColumn(dataMat)
+    dataMat = prependOnesColumn(svd.fit_transform(dataMat))
+    mainTimer.lap("Reduced dimensionality for LR")
     normingDenominators = np.abs(dataMat.sum(axis=0)) + 1
+    mainTimer.lap("Calculated normalizing divisors for LR")
     dataMat = dataMat / normingDenominators
+    mainTimer.lap("Normalized data for LR")
+    mainTimer.levelUp()
     return svd, normingDenominators, deltaMat, dataMat
+
 def probMat(weightsMat, preprocDataMat):
     preNormed = np.exp(weightsMat * preprocDataMat.transpose())
     normed = preNormed / (preNormed.sum(axis=0)+1)
     return normed
+
 def logisticRegressionTrain(preprocDataMat, deltaMat, numIter, learnRate=0.01, penalty=0.01):
+    reportingInterval = round(numIter/10)
     weightsMat = np.matrix(np.zeros((len(ALL_CLASSES.keys()), preprocDataMat.shape[1])))
+    mainTimer.levelDown()
     for i in range(numIter):
         weightsMat = weightsMat + learnRate * (
             (deltaMat - probMat(weightsMat, preprocDataMat)) * preprocDataMat
             - penalty * weightsMat)
-        if numIter < 10 or i % round(numIter/10) == 0:
-            reportRunTime("Logistic regression iteration "+str(i))
+        if reportingInterval <= 1 or (i+1) % reportingInterval == 0:
+            mainTimer.lap("LR iterations {} to {}".format(i+1-reportingInterval,i))
+    mainTimer.levelUp()
     return weightsMat
+
+def preprocessUnclassifiedData(dataMat, svd, normingDenominators):
+#    dataMat = svd.transform(dataMat)
+#    dataMat = prependOnesColumn(dataMat)
+#    dataMat = dataMat / normingDenominators
+    return prependOnesColumn(svd.transform(dataMat)) / normingDenominators
+
 def logisticRegressionClassify(dataMat, svd, normingDenominators, weightsMat):
-    if dataMat.shape[1] == len(ALL_WORDS.keys()):
-        dataMat = prependOnesColumn(dataMat)
-    dataMat = svd.transform(dataMat)
-    dataMat = dataMat / normingDenominators
+    dataMat = preprocessUnclassifiedData(dataMat, svd, normingDenominators)
     likelyhoods = dataMat * weightsMat.transpose()
     return np.array((np.argmax(likelyhoods, axis=1) + 1).flatten().tolist()[0])
+
 if DO_LOGISTIC_REGRESSION:
     #%% Train, validate and test logistic regression
     trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES, 0.75)
-    reportRunTime("Split data into training and validation")
-    svd, normingDenominators, deltaMat, dataMat = preprocessData(trainingData, False)
-    reportRunTime("Logistic regression preprocessing")
+    mainTimer.lap("Split data into training and validation")
+    svd, normingDenominators, deltaMat, dataMat = preprocessTrainingData(trainingData)
+    mainTimer.lap("LR preprocessing")
     weightsMat = None
-    numIter = 100
+    numIter = 10
     learnRate = 0.01
     penalty = 0.01
     errorRates = []
+    
     if DO_NUM_INTERS_SEARCH:
-        print("learnRate = {}  penalty = {}".format(learnRate, penalty))
-        if dataMat.shape[1] < 3000:
+        mainTimer.reset()
+        print("numDims = {} learnRate = {}  penalty = {}".format(dataMat.shape[1],learnRate,
+                                                                 penalty))
+        if dataMat.shape[1] < 10000:
             iterNums = np.round(np.logspace(3.75, 4.5, 5)).astype(np.int64)
         else:
             iterNums = np.round(np.logspace(0, 3, 4)).astype(np.int64)
+        mainTimer.levelDown()
         for numIter in iterNums:
             weightsMat = logisticRegressionTrain(dataMat, deltaMat,
                                                  numIter=numIter,
                                                  learnRate=learnRate,
                                                  penalty=penalty)
+            mainTimer.lap("Trained LR for {} interations".format(numIter))
             errorRates.append(validateClassifier(validationData, False, logisticRegressionClassify,
                                                  svd=svd,
                                                  normingDenominators=normingDenominators,
                                                  weightsMat=weightsMat))
-            print("Error Rate = {:.4f} for {} iterations".format(errorRates[-1], numIter))
-            fileName = "LR{:.4f}ErrRt{}Iters{}LearnRt{}Penalty".format(errorRates[-1], numIter,
-                                                                       learnRate, penalty)
+            mainTimer.lap("Validated LR")
+            print("Error Rate = {:.4f}".format(errorRates[-1], numIter))
+            fileName = "LR{:.4f}ErrRt_{}Dims_{}Iters_{}LearnRt_{}Penalty".format(errorRates[-1],
+                                                                                 dataMat.shape[1],
+                                                                                 numIter,
+                                                                                 learnRate,
+                                                                                 penalty)
             savePickle((svd, normingDenominators, weightsMat), fileName)
+        mainTimer.levelUp()
         plt.plot(iterNums, np.array(errorRates))
+        mainTimer.lap("Found best number of iterations for LR")
+    
     if DO_LEARN_RATE_SEARCH:
-        pass
+        mainTimer.reset()
+        mainTimer.lap("Found best learning rate for LR")
+    
     if DO_PENALTY_SEARCH:
-        pass
+        mainTimer.reset()
+        mainTimer.lap("Found best penalty strength for LR")
+    
     if weightsMat is None:
+        mainTimer.reset()
         weightsMat = logisticRegressionTrain(dataMat, deltaMat,
                                              numIter=numIter,
                                              learnRate=learnRate,
                                              penalty=penalty)
+        mainTimer.lap("Trained LR")
     errorRate, confusionMat = validateClassifier(validationData, True, logisticRegressionClassify,
                                                  svd=svd,
                                                  normingDenominators=normingDenominators,
                                                  weightsMat=weightsMat)
+    print("Error Rate = {:.4f} for {} iterations".format(errorRate, numIter))
     plotConfusionMat(confusionMat, "Confusion Matrix\nError Rate = "+str(errorRate))
+    mainTimer.lap("Validated LR")
     testClassifier(TEST_EXAMPLES, logisticRegressionClassify, svd=svd,
                    normingDenominators=normingDenominators, weightsMat=weightsMat)
+    mainTimer.lap("Tested LR")
