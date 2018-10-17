@@ -15,9 +15,10 @@ PKL_FILE_NAME = "ConstructionZone2Vars.pkl"
 DO_NAIVE_BAYES = False
 DO_NAIVE_BAYES_BETA_SEARCHING = False
 DO_LOGISTIC_REGRESSION = True
-DO_NUM_INTERS_SEARCH = False
+DO_NUM_INTERS_SEARCH = True
 DO_LEARN_RATE_SEARCH = True
 DO_PENALTY_SEARCH = True
+DO_TEST_LOGISTIC_REGRESSION = True
 
 #%% Define time related items
 class Timer(object):
@@ -312,6 +313,7 @@ if DO_NAIVE_BAYES:
                      "Average Confusion Matrix of "+str(numDataSplits)+" Naive Bayes Rounds"
                      +"\nAverage Error Rate = "+str(avgErrorRate))
     #%% Test Naive Bayes
+    mapMat, priors = naiveBayesTrain(ALL_CLASS_EXAMPLES)
     testClassifier(TEST_EXAMPLES, naiveBayesClassify, mapMat=mapMat, priors=priors)
     mainTimer.lap("Naive Bayes training, validating and testing")
     
@@ -422,7 +424,7 @@ if DO_LOGISTIC_REGRESSION:
         print("numDims = {} learnRate = {}  penalty = {}".format(dataMat.shape[1],learnRate,
                                                                  penalty))
         if dataMat.shape[1] < 10000:
-            iterNums = np.round(np.logspace(3.75, 4.5, 5)).astype(np.int64)
+            iterNums = np.round(np.logspace(3, 5, 3)).astype(np.int64)
         else:
             iterNums = np.round(np.logspace(0, 3, 4)).astype(np.int64)
         mainTimer.levelDown()
@@ -463,13 +465,25 @@ if DO_LOGISTIC_REGRESSION:
                                              learnRate=learnRate,
                                              penalty=penalty)
         mainTimer.lap("Trained LR")
-    errorRate, confusionMat = validateClassifier(validationData, True, logisticRegressionClassify,
-                                                 svd=svd,
-                                                 normingDenominators=normingDenominators,
-                                                 weightsMat=weightsMat)
-    print("Error Rate = {:.4f} for {} iterations".format(errorRate, numIter))
-    plotConfusionMat(confusionMat, "Confusion Matrix\nError Rate = "+str(errorRate))
-    mainTimer.lap("Validated LR")
-    testClassifier(TEST_EXAMPLES, logisticRegressionClassify, svd=svd,
-                   normingDenominators=normingDenominators, weightsMat=weightsMat)
-    mainTimer.lap("Tested LR")
+        errorRate, confusionMat = validateClassifier(validationData, True, logisticRegressionClassify,
+                                                     svd=svd,
+                                                     normingDenominators=normingDenominators,
+                                                     weightsMat=weightsMat)
+        print("Error Rate = {:.4f} for {} iterations".format(errorRate, numIter))
+        plotConfusionMat(confusionMat, "Confusion Matrix\nError Rate = "+str(errorRate))
+        fileName = "LR{:.4f}ErrRt_{}Dims_{}Iters_{}LearnRt_{}Penalty".format(errorRate,
+                                                                         dataMat.shape[1],
+                                                                         numIter,
+                                                                         learnRate,
+                                                                         penalty)
+        savePickle((svd, normingDenominators, weightsMat), fileName)
+        mainTimer.lap("Validated LR")
+    if DO_TEST_LOGISTIC_REGRESSION:
+        svd, normingDenominators, deltaMat, dataMat = preprocessTrainingData(ALL_CLASS_EXAMPLES)
+        weightsMat = logisticRegressionTrain(dataMat, deltaMat,
+                                             numIter=numIter,
+                                             learnRate=learnRate,
+                                             penalty=penalty)
+        testClassifier(TEST_EXAMPLES, logisticRegressionClassify, svd=svd,
+                       normingDenominators=normingDenominators, weightsMat=weightsMat)
+        mainTimer.lap("Tested LR")
