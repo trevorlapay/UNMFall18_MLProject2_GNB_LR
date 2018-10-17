@@ -9,7 +9,7 @@ import pandas as pd
 import random
 import math
 
-PKL_FILE_NAME = "ConstructionZone2Vars.pkl"
+BASIC_DATA_PKL_FILE_NAME = "BasicData.pkl"
 
 #%% Decide what to do.
 DO_NAIVE_BAYES = False
@@ -69,7 +69,7 @@ try:
     (ALL_CLASSES,
      ALL_WORDS,
      ALL_CLASS_EXAMPLES,
-     TEST_EXAMPLES) = loadPickle(PKL_FILE_NAME)
+     TEST_EXAMPLES) = loadPickle(BASIC_DATA_PKL_FILE_NAME)
     mainTimer.lap("Loaded basic data from pkl file")
 except Exception as err:
     print("Could not load basic data from pkl file. Error details:")
@@ -145,7 +145,7 @@ except Exception as err:
     savePickle((ALL_CLASSES,
                 ALL_WORDS,
                 ALL_CLASS_EXAMPLES,
-                TEST_EXAMPLES), PKL_FILE_NAME)
+                TEST_EXAMPLES), BASIC_DATA_PKL_FILE_NAME)
     mainTimer.lap("Dumped basic data into pkl file")
 
 #%% Define data splitting functions.
