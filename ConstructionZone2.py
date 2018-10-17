@@ -4,7 +4,7 @@ import time
 import scipy as sp
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.decomposition import TruncatedSVD
+import sklearn as skl
 import pandas as pd
 import random
 import math
@@ -366,17 +366,17 @@ def preprocessTrainingData(trainingData, reduceDimTo=0):
     mainTimer.reset()
     mainTimer.levelDown()
     if reduceDimTo >= 2:
-        svd = TruncatedSVD(n_components=reduceDimTo)
+        reducer = skl.decomposition.TruncatedSVD(n_components=reduceDimTo)
     else:
-        svd = AntiDimRed()
-    dataMat = prependOnesColumn(svd.fit_transform(dataMat))
+        reducer = AntiDimRed()
+    dataMat = prependOnesColumn(reducer.fit_transform(dataMat))
     mainTimer.lap("Reduced dimensionality for LR")
-    normingDenominators = np.abs(dataMat.sum(axis=0)) + 1
+    normingDivisors = np.abs(dataMat.sum(axis=0)) + 1
     mainTimer.lap("Calculated normalizing divisors for LR")
-    dataMat = dataMat / normingDenominators
+    dataMat = dataMat / normingDivisors
     mainTimer.lap("Normalized data for LR")
     mainTimer.levelUp()
-    return svd, normingDenominators, deltaMat, dataMat
+    return reducer, normingDivisors, deltaMat, dataMat
 
 def probMat(weightsMat, preprocDataMat):
     preNormed = np.exp(weightsMat * preprocDataMat.transpose())
@@ -396,14 +396,11 @@ def logisticRegressionTrain(preprocDataMat, deltaMat, numIter, learnRate=0.01, p
     mainTimer.levelUp()
     return weightsMat
 
-def preprocessUnclassifiedData(dataMat, svd, normingDenominators):
-#    dataMat = svd.transform(dataMat)
-#    dataMat = prependOnesColumn(dataMat)
-#    dataMat = dataMat / normingDenominators
-    return prependOnesColumn(svd.transform(dataMat)) / normingDenominators
+def preprocessUnclassifiedData(dataMat, reducer, normingDivisors):
+    return prependOnesColumn(reducer.transform(dataMat)) / normingDivisors
 
-def logisticRegressionClassify(dataMat, svd, normingDenominators, weightsMat):
-    dataMat = preprocessUnclassifiedData(dataMat, svd, normingDenominators)
+def logisticRegressionClassify(dataMat, reducer, normingDivisors, weightsMat):
+    dataMat = preprocessUnclassifiedData(dataMat, reducer, normingDivisors)
     likelyhoods = dataMat * weightsMat.transpose()
     return np.array((np.argmax(likelyhoods, axis=1) + 1).flatten().tolist()[0])
 
@@ -411,7 +408,7 @@ if DO_LOGISTIC_REGRESSION:
     #%% Train, validate and test logistic regression
     trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES, 0.75)
     mainTimer.lap("Split data into training and validation")
-    svd, normingDenominators, deltaMat, dataMat = preprocessTrainingData(trainingData)
+    reducer, normingDivisors, deltaMat, dataMat = preprocessTrainingData(trainingData)
     mainTimer.lap("LR preprocessing")
     weightsMat = None
     numIter = 10
@@ -435,8 +432,8 @@ if DO_LOGISTIC_REGRESSION:
                                                  penalty=penalty)
             mainTimer.lap("Trained LR for {} interations".format(numIter))
             errorRates.append(validateClassifier(validationData, False, logisticRegressionClassify,
-                                                 svd=svd,
-                                                 normingDenominators=normingDenominators,
+                                                 reducer=reducer,
+                                                 normingDivisors=normingDivisors,
                                                  weightsMat=weightsMat))
             mainTimer.lap("Validated LR")
             print("Error Rate = {:.4f}".format(errorRates[-1], numIter))
@@ -445,7 +442,7 @@ if DO_LOGISTIC_REGRESSION:
                                                                                  numIter,
                                                                                  learnRate,
                                                                                  penalty)
-            savePickle((svd, normingDenominators, weightsMat), fileName)
+            savePickle((reducer, normingDivisors, weightsMat), fileName)
         mainTimer.levelUp()
         plt.plot(iterNums, np.array(errorRates))
         mainTimer.lap("Found best number of iterations for LR")
@@ -465,9 +462,10 @@ if DO_LOGISTIC_REGRESSION:
                                              learnRate=learnRate,
                                              penalty=penalty)
         mainTimer.lap("Trained LR")
-        errorRate, confusionMat = validateClassifier(validationData, True, logisticRegressionClassify,
-                                                     svd=svd,
-                                                     normingDenominators=normingDenominators,
+        errorRate, confusionMat = validateClassifier(validationData, True,
+                                                     logisticRegressionClassify,
+                                                     reducer=reducer,
+                                                     normingDivisors=normingDivisors,
                                                      weightsMat=weightsMat)
         print("Error Rate = {:.4f} for {} iterations".format(errorRate, numIter))
         plotConfusionMat(confusionMat, "Confusion Matrix\nError Rate = "+str(errorRate))
@@ -476,14 +474,14 @@ if DO_LOGISTIC_REGRESSION:
                                                                          numIter,
                                                                          learnRate,
                                                                          penalty)
-        savePickle((svd, normingDenominators, weightsMat), fileName)
+        savePickle((reducer, normingDivisors, weightsMat), fileName)
         mainTimer.lap("Validated LR")
     if DO_TEST_LOGISTIC_REGRESSION:
-        svd, normingDenominators, deltaMat, dataMat = preprocessTrainingData(ALL_CLASS_EXAMPLES)
+        reducer, normingDivisors, deltaMat, dataMat = preprocessTrainingData(ALL_CLASS_EXAMPLES)
         weightsMat = logisticRegressionTrain(dataMat, deltaMat,
                                              numIter=numIter,
                                              learnRate=learnRate,
                                              penalty=penalty)
-        testClassifier(TEST_EXAMPLES, logisticRegressionClassify, svd=svd,
-                       normingDenominators=normingDenominators, weightsMat=weightsMat)
+        testClassifier(TEST_EXAMPLES, logisticRegressionClassify, reducer=reducer,
+                       normingDivisors=normingDivisors, weightsMat=weightsMat)
         mainTimer.lap("Tested LR")
