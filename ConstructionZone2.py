@@ -10,10 +10,13 @@ import random
 import math
 
 PKL_FILE_NAME = "ConstructionZone2Vars.pkl"
+#%% Decide what to do.
 DO_NAIVE_BAYES = False
 DO_NAIVE_BAYES_BETA_SEARCHING = False
 DO_LOGISTIC_REGRESSION = True
-
+DO_NUM_INTERS_SEARCH = False
+DO_LEARN_RATE_SEARCH = True
+DO_PENALTY_SEARCH = True
 #%% Define time related items
 sTime = time.time()
 def reportRunTime(taskStr):
@@ -23,7 +26,7 @@ def reportRunTime(taskStr):
 def nowStr(): return time.strftime("%Y-%m-%d_%H-%M-%S")
 #%% Define pickle file functions
 def savePickle(obj, fileName=None):
-    if fileName == None: fileName = nowStr()+"pickleFile.pkl"
+    if fileName is None: fileName = nowStr()+"pickleFile.pkl"
     if fileName[-4:] != ".pkl": fileName += ".pkl"
     with open(fileName, 'wb') as pklFile:
         pickle.dump(obj, pklFile)
@@ -251,7 +254,7 @@ def plotErrorRatesAccrossBetas(betaAndErRts, fileName="BetaErrorRates"):
 if DO_NAIVE_BAYES:
     #%% Train and validate Naive Bayes with random subsets
     avgErrorRate = 0
-    avgConfusionMat = np.zeros((len(ALL_CLASSES),len(ALL_CLASSES)), dtype=np.int32)
+    avgConfusionMat = np.zeros((len(ALL_CLASSES),len(ALL_CLASSES)), dtype=np.int64)
     numDataSplits = 20
     for i in range(numDataSplits):
         trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES, 0.75)
@@ -292,11 +295,6 @@ def mashEverythingBackTogether(classExamples):
                                      for docIDs, dataMat in classExamples.values()])
     wholeDataMat = sp.sparse.vstack([dataMat for docIDs, dataMat in classExamples.values()])
     return wholeDataMat, deltaMat
-examplesWithImaginedWord = {classId : (docID,
-                                       sp.sparse.hstack([sp.ones((dataMat.shape[0],1)), dataMat],
-                                                        'csr', np.int32))
-                            for classId, (docID, dataMat) in ALL_CLASS_EXAMPLES.items()}
-trainingData, validationData = splitClassExamples(examplesWithImaginedWord, 0.75)
 class AntiDimRed(object):
     """docstring for AntiDimRed"""
     def __init__(self, arg=None):
@@ -306,16 +304,24 @@ class AntiDimRed(object):
         return dataMat
     def fit_transform(self, dataMat):
         return dataMat
+def prependOnesColumn(dataMat):
+    # TODO Test prependOnesColumn function.
+    if sp.sparse.issparse(dataMat):
+        return sp.sparse.hstack([sp.ones((dataMat.shape[0],1)), dataMat], 'csr', np.int32)
+    else:
+        return np.hstack([np.ones((dataMat.shape[0],1)), dataMat], dtype=np.int32)
 def preprocessData(trainingData, doDimRed=True):
-    mashedTrainingData, deltaMat = mashEverythingBackTogether(trainingData)
+    dataMat, deltaMat = mashEverythingBackTogether(trainingData)
     if doDimRed:
-        svd = TruncatedSVD(n_components=500)
+        svd = TruncatedSVD(n_components=1000)
     else:
         svd = AntiDimRed()
-    dimRedMashedData = svd.fit_transform(mashedTrainingData)
-    normingDenominators = np.abs(dimRedMashedData.sum(axis=0)) + 1
-    normedDimRedMashedData = dimRedMashedData / normingDenominators
-    return svd, normingDenominators, deltaMat, normedDimRedMashedData
+    dataMat = svd.fit_transform(dataMat)
+    # Add column of ones at the beguining of dataMat
+    dataMat = prependOnesColumn(dataMat)
+    normingDenominators = np.abs(dataMat.sum(axis=0)) + 1
+    dataMat = dataMat / normingDenominators
+    return svd, normingDenominators, deltaMat, dataMat
 def probMat(weightsMat, preprocDataMat):
     preNormed = np.exp(weightsMat * preprocDataMat.transpose())
     normed = preNormed / (preNormed.sum(axis=0)+1)
@@ -326,37 +332,60 @@ def logisticRegressionTrain(preprocDataMat, deltaMat, numIter, learnRate=0.01, p
         weightsMat = weightsMat + learnRate * (
             (deltaMat - probMat(weightsMat, preprocDataMat)) * preprocDataMat
             - penalty * weightsMat)
-        if i % 100 == 0:
+        if numIter < 10 or i % round(numIter/10) == 0:
             reportRunTime("Logistic regression iteration "+str(i))
     return weightsMat
 def logisticRegressionClassify(dataMat, svd, normingDenominators, weightsMat):
     if dataMat.shape[1] == len(ALL_WORDS.keys()):
-        dataMat = sp.sparse.hstack([sp.ones((dataMat.shape[0],1)), dataMat], 'csr', np.int32)
+        dataMat = prependOnesColumn(dataMat)
     dataMat = svd.transform(dataMat)
     dataMat = dataMat / normingDenominators
     likelyhoods = dataMat * weightsMat.transpose()
     return np.array((np.argmax(likelyhoods, axis=1) + 1).flatten().tolist()[0])
 if DO_LOGISTIC_REGRESSION:
     #%% Train, validate and test logistic regression
-    svd, normingDenominators, deltaMat, preprocDataMat = preprocessData(trainingData, False)
-    errorRates = []
+    trainingData, validationData = splitClassExamples(ALL_CLASS_EXAMPLES, 0.75)
+    reportRunTime("Split data into training and validation")
+    svd, normingDenominators, deltaMat, dataMat = preprocessData(trainingData, False)
+    reportRunTime("Logistic regression preprocessing")
+    weightsMat = None
+    numIter = 100
     learnRate = 0.01
     penalty = 0.01
-    numIters = np.array([1,10,100,1000])#np.round(np.logspace(3.75, 4.5, 5)).astype(np.int64)
-    for numIter in numIters:
-        weightsMat = logisticRegressionTrain(preprocDataMat, deltaMat,
+    errorRates = []
+    if DO_NUM_INTERS_SEARCH:
+        print("learnRate = {}  penalty = {}".format(learnRate, penalty))
+        if dataMat.shape[1] < 3000:
+            iterNums = np.round(np.logspace(3.75, 4.5, 5)).astype(np.int64)
+        else:
+            iterNums = np.round(np.logspace(0, 3, 4)).astype(np.int64)
+        for numIter in iterNums:
+            weightsMat = logisticRegressionTrain(dataMat, deltaMat,
+                                                 numIter=numIter,
+                                                 learnRate=learnRate,
+                                                 penalty=penalty)
+            errorRates.append(validateClassifier(validationData, False, logisticRegressionClassify,
+                                                 svd=svd,
+                                                 normingDenominators=normingDenominators,
+                                                 weightsMat=weightsMat))
+            print("Error Rate = {:.4f} for {} iterations".format(errorRates[-1], numIter))
+            fileName = "LR{:.4f}ErrRt{}Iters{}LearnRt{}Penalty".format(errorRates[-1], numIter,
+                                                                       learnRate, penalty)
+            savePickle((svd, normingDenominators, weightsMat), fileName)
+        plt.plot(iterNums, np.array(errorRates))
+    if DO_LEARN_RATE_SEARCH:
+        pass
+    if DO_PENALTY_SEARCH:
+        pass
+    if weightsMat is None:
+        weightsMat = logisticRegressionTrain(dataMat, deltaMat,
                                              numIter=numIter,
                                              learnRate=learnRate,
                                              penalty=penalty)
-        errorRates.append(validateClassifier(validationData, False, logisticRegressionClassify,
-                                             svd=svd,
-                                             normingDenominators=normingDenominators,
-                                             weightsMat=weightsMat))
-        print("Error Rate = {:.4f} for {} iterations".format(errorRates[-1], numIter))
-        fileName = "LR{:.4f}ErrRt{}Iters{}LearnRt{}Penalty".format(errorRates[-1], numIter,
-                                                                   learnRate, penalty)
-        savePickle((svd, normingDenominators, weightsMat), fileName)
-    plt.plot(numIters, np.array(errorRates))
-    #plotConfusionMat(confMat, "Confusion Matrix\nError Rate = "+str(errorRate))
-    #testClassifier(TEST_EXAMPLES, logisticRegressionClassify, svd=svd,
-    #               normingDenominators=normingDenominators, weightsMat=weightsMat)
+    errorRate, confusionMat = validateClassifier(validationData, True, logisticRegressionClassify,
+                                                 svd=svd,
+                                                 normingDenominators=normingDenominators,
+                                                 weightsMat=weightsMat)
+    plotConfusionMat(confusionMat, "Confusion Matrix\nError Rate = "+str(errorRate))
+    testClassifier(TEST_EXAMPLES, logisticRegressionClassify, svd=svd,
+                   normingDenominators=normingDenominators, weightsMat=weightsMat)
