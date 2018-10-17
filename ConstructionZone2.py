@@ -384,10 +384,10 @@ def probMat(weightsMat, preprocDataMat):
     return normed
 
 def logisticRegressionTrain(preprocDataMat, deltaMat, numIter, learnRate=0.01, penalty=0.01):
-    reportingInterval = round(numIter/10)
+    reportingInterval = int(round(numIter/10))
     weightsMat = np.matrix(np.zeros((len(ALL_CLASSES.keys()), preprocDataMat.shape[1])))
     mainTimer.levelDown()
-    for i in range(numIter):
+    for i in range(round(numIter)):
         weightsMat = weightsMat + learnRate * (
             (deltaMat - probMat(weightsMat, preprocDataMat)) * preprocDataMat
             - penalty * weightsMat)
