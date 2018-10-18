@@ -17,9 +17,9 @@ DO_NAIVE_BAYES = False
 DO_NAIVE_BAYES_BETA_SEARCHING = False
 DO_LOGISTIC_REGRESSION = True
 DO_LOGISTIC_REGRESSION_NUM_INTERS_SEARCH = False
-DO_LOGISTIC_REGRESSION_LEARN_RATE_SEARCH = True
-DO_LOGISTIC_REGRESSION_PENALTY_SEARCH = True
-DO_LOGISTIC_REGRESSION_VALIDATE = False
+DO_LOGISTIC_REGRESSION_LEARN_RATE_SEARCH = False
+DO_LOGISTIC_REGRESSION_PENALTY_SEARCH = False
+DO_LOGISTIC_REGRESSION_VALIDATE = True
 DO_LOGISTIC_REGRESSION_TEST = True
 
 #%% Define time related items
@@ -46,6 +46,8 @@ class Timer(object):
             self.reset()
     def reset(self):
         self.startTimes[self.level] = time.time()
+    def message(self, msgStr):
+        print("    " * self.level + msgStr)
 def nowStr(): return time.strftime("%Y-%m-%d_%H-%M-%S")
 
 #%% Define pickle file functions
@@ -276,10 +278,10 @@ def getBetaErrorRates(numBetas=100, numDataSplits=10, start=-5, stop=0):
         savePickle(betaAndErRts, fileName)
         bestBeta,lowestErrorRate = min(betaAndErRts.items(), key=lambda betaAndErRt: betaAndErRt[1])
         if oldBestBeta != bestBeta:
-            print("bestBeta changed from {} to {}".format(oldBestBeta, bestBeta))
+            mainTimer.message("bestBeta changed from {} to {}".format(oldBestBeta, bestBeta))
             oldBestBeta = bestBeta
         else:
-            print("bestBeta stayed "+str(oldBestBeta))
+            mainTimer.message("bestBeta stayed "+str(oldBestBeta))
     mainTimer.levelUp()
     return betaAndErRts
 
@@ -407,6 +409,7 @@ def logisticRegressionClassify(dataMat, reducer, normingDivisors, weightsMat):
 
 if DO_LOGISTIC_REGRESSION:
     #%% Train, validate and test logistic regression
+    mainTimer.message("Starting logistic regression")
     reduceDimTo = 0 # 0 indicates not to reduce dimensions at all.
     learnRate = 0.01
     penalty = 0.001
@@ -423,9 +426,11 @@ if DO_LOGISTIC_REGRESSION:
     errorRates = []
     
     if DO_LOGISTIC_REGRESSION_NUM_INTERS_SEARCH:
+        mainTimer.message("Starting best number of interations search")
+        mainTimer.message("numDims = {} learnRate = {}  penalty = {}".format(dataMat.shape[1],
+                                                                             learnRate,
+                                                                             penalty))
         mainTimer.reset()
-        print("numDims = {} learnRate = {}  penalty = {}".format(dataMat.shape[1],learnRate,
-                                                                 penalty))
         if dataMat.shape[1] < 10000:
             iterNums = np.round(np.logspace(3, 5, 3)).astype(np.int64)
         else:
@@ -445,15 +450,16 @@ if DO_LOGISTIC_REGRESSION:
             mainTimer.lap("Validated LR")
             addToCSV([errorRates[-1], dataMat.shape[1], learnRate, penalty, numIter],
                      'LR_Validations.csv')
-            print("Error Rate = {:.4f}".format(errorRates[-1], numIter))
+            mainTimer.message("Error Rate = {:.4f}".format(errorRates[-1], numIter))
         mainTimer.levelUp()
 
         plt.plot(iterNums, np.array(errorRates))
         mainTimer.lap("Found best number of iterations for LR")
     
     if DO_LOGISTIC_REGRESSION_LEARN_RATE_SEARCH:
-        mainTimer.reset()
         # %% Find accuracies over various learn rates
+        mainTimer.message("Starting best learn rate search")
+        mainTimer.reset()
 
         learnRates = np.geomspace(.001, .01, 10)
 
@@ -470,12 +476,8 @@ if DO_LOGISTIC_REGRESSION:
                                                  weightsMat=weightsMat))
             mainTimer.lap("Validated LR")
             print("Error Rate = {:.4f}".format(errorRates[-1], numIter))
-            fileName = "LR{:.4f}ErrRt_{}Dims_{}Iters_{}LearnRt_{}Penalty".format(errorRates[-1],
-                                                                                 dataMat.shape[1],
-                                                                                 numIter,
-                                                                                 learnRateIter,
-                                                                                 penalty)
-            savePickle((reducer, normingDivisors, weightsMat), fileName)
+            addToCSV([errorRates[-1], dataMat.shape[1], learnRate, penalty, numIter],
+                     'LR_Validations.csv')
         mainTimer.levelUp()
         plt.plot(learnRates, np.array(errorRates))
 
@@ -486,9 +488,9 @@ if DO_LOGISTIC_REGRESSION:
         mainTimer.lap("Found best learning rate for LR")
     
     if DO_LOGISTIC_REGRESSION_PENALTY_SEARCH:
-        print("Starting best penalty ")
-        mainTimer.reset()
         # %% Find accuracies over various learn rates
+        mainTimer.message("Starting best penalty search")
+        mainTimer.reset()
 
         penaltyTerms = np.geomspace(.001, .01, 10)
 
@@ -504,13 +506,9 @@ if DO_LOGISTIC_REGRESSION:
                                                  normingDivisors=normingDivisors,
                                                  weightsMat=weightsMat))
             mainTimer.lap("Validated LR")
-            print("Error Rate = {:.4f}".format(errorRates[-1], numIter))
-            fileName = "LR{:.4f}ErrRt_{}Dims_{}Iters_{}LearnRt_{}Penalty".format(errorRates[-1],
-                                                                                 dataMat.shape[1],
-                                                                                 numIter,
-                                                                                 penaltyIter,
-                                                                                 penalty)
-            savePickle((reducer, normingDivisors, weightsMat), fileName)
+            mainTimer.message("Error Rate = {:.4f}".format(errorRates[-1], numIter))
+            addToCSV([errorRates[-1], dataMat.shape[1], learnRate, penalty, numIter],
+                     'LR_Validations.csv')
         mainTimer.levelUp()
         plt.plot(penaltyTerms, np.array(errorRates))
 
@@ -520,6 +518,7 @@ if DO_LOGISTIC_REGRESSION:
         mainTimer.lap("Found best penalty strength for LR")
     
     if DO_LOGISTIC_REGRESSION_VALIDATE:
+        mainTimer.message("Starting validation for logistic regression")
         mainTimer.reset()
         weightsMat = logisticRegressionTrain(dataMat, deltaMat,
                                              learnRate=learnRate,
@@ -531,11 +530,13 @@ if DO_LOGISTIC_REGRESSION:
                                                      reducer=reducer,
                                                      normingDivisors=normingDivisors,
                                                      weightsMat=weightsMat)
-        print("Error Rate = {:.4f} for {} iterations".format(errorRate, numIter))
+        mainTimer.message("Error Rate = {:.4f} for {} iterations".format(errorRate, numIter))
         plotConfusionMat(confusionMat, "Confusion Matrix\nError Rate = "+str(errorRate))
         addToCSV([errorRate, dataMat.shape[1], learnRate, penalty, numIter], 'LR_Validations.csv')
         mainTimer.lap("Validated LR")
+    
     if DO_LOGISTIC_REGRESSION_TEST:
+        mainTimer.message("Starting testing for logistic regression")
         numDims = (reduceDimTo if reduceDimTo >= 2 else ALL_CLASS_EXAMPLES[1][1].shape[1]) + 1
         fileName = "LR_{}Dims_{}LearnRt_{}Penalty_{}Iters".format(numDims,
                                                                   learnRate,
