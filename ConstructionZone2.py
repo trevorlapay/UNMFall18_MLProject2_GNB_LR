@@ -15,10 +15,10 @@ BASIC_DATA_PKL_FILE_NAME = "BasicData.pkl"
 DO_NAIVE_BAYES = False
 DO_NAIVE_BAYES_BETA_SEARCHING = False
 DO_LOGISTIC_REGRESSION = True
-DO_NUM_INTERS_SEARCH = True
-DO_LEARN_RATE_SEARCH = True
+DO_NUM_INTERS_SEARCH = False
+DO_LEARN_RATE_SEARCH = False
 DO_PENALTY_SEARCH = True
-DO_TEST_LOGISTIC_REGRESSION = True
+DO_TEST_LOGISTIC_REGRESSION = False
 
 #%% Define time related items
 class Timer(object):
@@ -316,7 +316,7 @@ if DO_NAIVE_BAYES:
     mapMat, priors = naiveBayesTrain(ALL_CLASS_EXAMPLES)
     testClassifier(TEST_EXAMPLES, naiveBayesClassify, mapMat=mapMat, priors=priors)
     mainTimer.lap("Naive Bayes training, validating and testing")
-    
+
     if DO_NAIVE_BAYES_BETA_SEARCHING:
         #%% Find best beta
         numBetas = 2000
@@ -336,7 +336,7 @@ if DO_NAIVE_BAYES:
                 betaAndErRts = getBetaErrorRates(numBetas, numDataSplits)
                 plotErrorRatesAccrossBetas(betaAndErRts)
                 mainTimer.lap("Found best beta")
-                
+
 
 #%% Define logistic regression functions
 def mashEverythingBackTogether(classExamples):
@@ -444,15 +444,75 @@ if DO_LOGISTIC_REGRESSION:
                                                                                  penalty)
             savePickle((reducer, normingDivisors, weightsMat), fileName)
         mainTimer.levelUp()
+
         plt.plot(iterNums, np.array(errorRates))
         mainTimer.lap("Found best number of iterations for LR")
     
     if DO_LEARN_RATE_SEARCH:
         mainTimer.reset()
+        # %% Find accuracies over various learn rates
+
+        learnRates = np.geomspace(.001, .01, 10)
+
+        mainTimer.levelDown()
+        for learnRateIter in learnRates:
+            weightsMat = logisticRegressionTrain(dataMat, deltaMat,
+                                                 numIter=numIter,
+                                                 learnRate=learnRateIter,
+                                                 penalty=penalty)
+            mainTimer.lap("Trained LR for {} learn rate".format(learnRateIter))
+            errorRates.append(validateClassifier(validationData, False, logisticRegressionClassify,
+                                                 reducer=reducer,
+                                                 normingDivisors=normingDivisors,
+                                                 weightsMat=weightsMat))
+            mainTimer.lap("Validated LR")
+            print("Error Rate = {:.4f}".format(errorRates[-1], numIter))
+            fileName = "LR{:.4f}ErrRt_{}Dims_{}Iters_{}LearnRt_{}Penalty".format(errorRates[-1],
+                                                                                 dataMat.shape[1],
+                                                                                 numIter,
+                                                                                 learnRateIter,
+                                                                                 penalty)
+            savePickle((reducer, normingDivisors, weightsMat), fileName)
+        mainTimer.levelUp()
+        plt.plot(learnRates, np.array(errorRates))
+
+        plt.xlabel("Learning Rate", size=14)
+        plt.ylabel("Error Rate", size=14)
+        plt.show()
+
         mainTimer.lap("Found best learning rate for LR")
     
     if DO_PENALTY_SEARCH:
         mainTimer.reset()
+        # %% Find accuracies over various learn rates
+
+        penaltyTerms = np.geomspace(.001, .01, 10)
+
+        mainTimer.levelDown()
+        for penaltyIter in penaltyTerms:
+            weightsMat = logisticRegressionTrain(dataMat, deltaMat,
+                                                 numIter=numIter,
+                                                 learnRate=learnRate,
+                                                 penalty=penaltyIter)
+            mainTimer.lap("Trained LR for {} penalty term".format(penaltyIter))
+            errorRates.append(validateClassifier(validationData, False, logisticRegressionClassify,
+                                                 reducer=reducer,
+                                                 normingDivisors=normingDivisors,
+                                                 weightsMat=weightsMat))
+            mainTimer.lap("Validated LR")
+            print("Error Rate = {:.4f}".format(errorRates[-1], numIter))
+            fileName = "LR{:.4f}ErrRt_{}Dims_{}Iters_{}LearnRt_{}Penalty".format(errorRates[-1],
+                                                                                 dataMat.shape[1],
+                                                                                 numIter,
+                                                                                 penaltyIter,
+                                                                                 penalty)
+            savePickle((reducer, normingDivisors, weightsMat), fileName)
+        mainTimer.levelUp()
+        plt.plot(penaltyTerms, np.array(errorRates))
+
+        plt.xlabel("Penalty Term Value", size=14)
+        plt.ylabel("Error Rate", size=14)
+        plt.show()
         mainTimer.lap("Found best penalty strength for LR")
     
     if weightsMat is None:
