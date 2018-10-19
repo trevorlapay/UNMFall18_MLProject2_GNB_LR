@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0eefa4ce-e9ea-44b9-8f02-c3423378e1af" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/ConstructionZone2.py" beforeDir="false" afterPath="$PROJECT_DIR$/ConstructionZone2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ConstructionZone2.py" beforeDir="false" afterPath="$PROJECT_DIR$/ML_2018_NaiveBayes_LogisticRegression.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -59,26 +60,52 @@
     <session id="1399345018">
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
+          <entry key="dummy" value="37" />
+          <entry key="md" value="434" />
           <entry key="py" value="14" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
+          <entry key="Markdown" value="434" />
+          <entry key="PLAIN_TEXT" value="37" />
           <entry key="Python" value="14" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="md" value="1" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="Markdown" value="1" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/ConstructionZone2.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ML_2018_NaiveBayes_LogisticRegression.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="706">
-              <caret line="490" column="56" selection-start-line="490" selection-start-column="56" selection-end-line="490" selection-end-column="56" />
+            <state relative-caret-position="17">
+              <caret line="1" selection-start-line="1" selection-end-line="10" selection-end-column="10" />
               <folding>
                 <element signature="e#12#25#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="357">
+                <caret line="21" column="89" selection-start-line="21" selection-start-column="89" selection-end-line="21" selection-end-column="89" />
+              </first_editor>
+              <second_editor />
             </state>
           </provider>
         </entry>
@@ -125,6 +152,7 @@
       <find>newsg</find>
       <find>news</find>
       <find>listofl</find>
+      <find>learn</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -143,6 +171,7 @@
         <option value="$PROJECT_DIR$/ConstructionZone.py" />
         <option value="$PROJECT_DIR$/ConstructionZone_Logistic.py" />
         <option value="$PROJECT_DIR$/ConstructionZone2.py" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -220,7 +249,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ConstructionZone2.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\Trevor\PycharmProjects\UNMFall18_ML_Project2_NB_LR\ML_2018_NaiveBayes_LogisticRegression.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -352,17 +381,17 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/ConstructionZone2.py</url>
+          <url>file://$PROJECT_DIR$/ML_2018_NaiveBayes_LogisticRegression.py</url>
           <line>30</line>
           <option name="timeStamp" value="24" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/ConstructionZone2.py</url>
+          <url>file://$PROJECT_DIR$/ML_2018_NaiveBayes_LogisticRegression.py</url>
           <line>24</line>
           <option name="timeStamp" value="25" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/ConstructionZone2.py</url>
+          <url>file://$PROJECT_DIR$/ML_2018_NaiveBayes_LogisticRegression.py</url>
           <line>21</line>
           <option name="timeStamp" value="27" />
         </line-breakpoint>
@@ -462,30 +491,10 @@
     </entry>
     <entry file="file:///Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/pandas/core/sparse/frame.py" />
     <entry file="file://$PROJECT_DIR$/training.csv" />
-    <entry file="file://$PROJECT_DIR$/ConstructionZone2.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="706">
-          <caret line="490" column="56" selection-start-line="490" selection-start-column="56" selection-end-line="490" selection-end-column="56" />
-          <folding>
-            <element signature="e#12#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/vocabulary.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135960">
           <caret line="9064" column="6" selection-start-line="9064" selection-start-column="6" selection-end-line="9064" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="-214">
-            <caret line="2" selection-start-line="2" selection-end-line="2" />
-          </first_editor>
-          <second_editor />
         </state>
       </provider>
     </entry>
@@ -536,6 +545,26 @@
     <entry file="file://$PROJECT_DIR$/delta_matrix.csv">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1138" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ML_2018_NaiveBayes_LogisticRegression.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" selection-start-line="1" selection-end-line="10" selection-end-column="10" />
+          <folding>
+            <element signature="e#12#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="357">
+            <caret line="21" column="89" selection-start-line="21" selection-start-column="89" selection-end-line="21" selection-end-column="89" />
+          </first_editor>
+          <second_editor />
+        </state>
       </provider>
     </entry>
   </component>
