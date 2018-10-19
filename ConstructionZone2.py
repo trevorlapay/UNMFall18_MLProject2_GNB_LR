@@ -488,7 +488,7 @@ if DO_LOGISTIC_REGRESSION:
         mainTimer.lap("Found best learning rate for LR")
     
     if DO_LOGISTIC_REGRESSION_PENALTY_SEARCH:
-        # %% Find accuracies over various learn rates
+        # %% Find accuracies over various penalty values
         mainTimer.message("Starting best penalty search")
         mainTimer.reset()
 
